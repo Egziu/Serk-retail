@@ -1,0 +1,7 @@
+FAIL: test_02_retry_with_same_key_returns_same_sale (serk_retail.tests.test_m1_flow.TestM1RetailFlow.test_02_retry_with_same_key_returns_same_sale)
+AssertionError: 'ACC-SINV-2026-00101' != 'ACC-SINV-2026-00102'
+FAIL: test_04_concurrent_duplicate_requests_create_one_sale (serk_retail.tests.test_m1_flow.TestM1RetailFlow.test_04_concurrent_duplicate_requests_create_one_sale)
+AssertionError: 4 != 1 : []
+Ran 2 tests in 4.470s
+FAILED (failures=2)
+MUTANT KILLED: 2/2 tests failed with idempotency disabled

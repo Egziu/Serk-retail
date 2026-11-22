@@ -50,3 +50,12 @@ MUTANT KILLED: 2/2 tests failed with idempotency disabled
 Physical hardware · offline/crash-recovery · non-cash tenders · promotions/loyalty · batches/expiry ·
 tax-inclusive pricing · load/performance · cross-tenant isolation · cashier UI/accessibility ·
 multilingual receipts · backup/restore · upgrade rehearsal.
+
+## HTTP smoke (real request path)
+
+`scripts/http_smoke.sh serk.localhost http://127.0.0.1:8000` against `bench serve` — session login,
+JSON request bodies, Frappe type validation, commit-before-response. Output:
+[`evidence/http_smoke.txt`](evidence/http_smoke.txt). Same-key retry over HTTP returned the
+same invoice with `idempotent_replay: true`; client-supplied price refused; blind close variance 0.
+A first attempt (before stock was received on the dev site) correctly failed with
+`NegativeStockError` and left no partial state.

@@ -19,3 +19,4 @@ Likelihood/Impact: L/M/H. Owner "SERK Eng" unless stated.
 | R-13 | Upstream `islands/yarn.lock` incomplete at this commit; `yarn install` rewrites it | M | L | Reverted; reproducible frontend builds need a lockfile strategy. |
 | R-14 | Tests commit to the DB; running them on a real site would add synthetic sales | L | H | Documented; dedicated disposable site; future: guard that refuses non-test sites. |
 | R-15 | Synthetic cash-only scope: card/mobile money unknown-outcome handling not yet exercised | H | H | Blocked on provider specs; design in ADR-004 already separates payment state. |
+| R-16 | `developer_mode` returns full server tracebacks in API errors (observed in HTTP smoke on the dev site) | M | M | Dev only. Production profile must disable developer_mode; SERK error contract to return code + safe message only. |

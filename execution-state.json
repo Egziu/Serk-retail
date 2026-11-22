@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "project": "SERK Retail",
+  "updated_at": "2026-11-22T12:10:00+03:00",
+  "governing_brief": "SERK_Retail_Master_Engineering_Prompt.md (prepared 2026-11-22)",
+  "current_phase": "M1",
+  "phase_status": {
+    "M0": "complete",
+    "M1": "first vertical slice complete (cash-only, API-level, simulator printing); cashier UI not built",
+    "M2": "not started",
+    "M3": "not started",
+    "M4": "not started",
+    "M5": "not started",
+    "M6": "not started"
+  },
+  "revisions": {
+    "serk_retail_tested_code_commit": "9e87cc520157d8945143caa3e0e378cc483845ce",
+    "serk_retail_branch": "m1-first-sale",
+    "serk_retail_pushed": false,
+    "erpnext": "20b97fa800c5548da786ced57111f51c858aea36 (== supplied ZIP, verified; clean tree)",
+    "frappe": "fdb29e699921b59d895586b3dbea3e61baedf137 (time-paired, inferred; clean tree)",
+    "core_patches": []
+  },
+  "environment": {
+    "python": "3.14.6",
+    "node": "24.22.3",
+    "mariadb": "10.11.14",
+    "bench": "5.31.1",
+    "sites": {
+      "serk.localhost": "dev site: erpnext + serk_retail installed, synthetic seed applied; credentials in ~/.serk_demo_credentials (0600); HTTP smoke passed",
+      "test.localhost": "upstream baseline tests (erpnext only)",
+      "serktest.localhost": "DISPOSABLE: M1 tests commit data here"
+    },
+    "notes": "Built in an ephemeral cloud workspace; reproduce with scripts/dev_setup.sh. Secrets live in ~/.db_root, ~/.admin_pw (0600) and are not in the repo."
+  },
+  "completed_requirement_ids": [
+    "RET-M1-001",
+    "RET-INV-001",
+    "RET-POS-001",
+    "RET-POS-002",
+    "RET-POS-003",
+    "RET-POS-004",
+    "RET-POS-005",
+    "RET-POS-006",
+    "RET-POS-007",
+    "RET-POS-008",
+    "RET-POS-009",
+    "RET-POS-010",
+    "RET-POS-011",
+    "RET-POS-012",
+    "RET-POS-013",
+    "RET-PRC-001",
+    "RET-SEC-001",
+    "RET-SEC-002",
+    "RET-SEC-003",
+    "RET-SEC-005"
+  ],
+  "simulated_only_requirement_ids": [
+    "RET-HW-001",
+    "RET-HW-002",
+    "RET-HW-003",
+    "RET-HW-004"
+  ],
+  "evidence": {
+    "upstream_baseline": "docs/engineering/BASELINE.md; docs/testing/evidence/upstream_baseline_junit_summary.json (501 passed after freezegun install)",
+    "m1_tests": "docs/testing/M1_TEST_EVIDENCE.md; docs/testing/evidence/m1_junit.xml (13 passed)",
+    "mutation_check": "docs/testing/evidence/mutation_check.txt (MUTANT KILLED 2/2)",
+    "provenance": "docs/engineering/SOURCE_PROVENANCE.md",
+    "http_smoke": "docs/testing/evidence/http_smoke.txt"
+  },
+  "outstanding_defects": [],
+  "upstream_workarounds": [
+    "W-01 rounding not copied",
+    "W-02 closing saves opening entry with perms",
+    "W-03 return mapper create check"
+  ],
+  "blockers": [
+    {
+      "id": "B-01",
+      "item": "Physical POS hardware for qualification",
+      "needs": "device list + devices on target OS"
+    },
+    {
+      "id": "B-02",
+      "item": "Ethiopian fiscal/VAT requirements and approval",
+      "needs": "owner/tax advisor input"
+    },
+    {
+      "id": "B-03",
+      "item": "Card/mobile-money provider integration",
+      "needs": "provider specs + sandbox credentials"
+    }
+  ],
+  "decisions": [
+    "ADR-001 custom app, unmodified ERPNext, ERPNext is ledger authority",
+    "ADR-002 POS Sales Invoice mode",
+    "ADR-003 API gateway authorization with narrow grants",
+    "ADR-004 scoped same-transaction idempotency",
+    "ADR-005 register = POS Profile",
+    "ADR-006 tenant = site/database",
+    "ADR-007 store-local server pilot topology (proposed)",
+    "ADR-008 persistent print jobs + adapters"
+  ],
+  "open_questions_for_owner": [
+    "Pilot store hardware (printer, drawer, scanner, scale models) and OS",
+    "Can the pilot run on a store-local server (ADR-007)?",
+    "Real tax treatment: VAT-inclusive shelf prices? TOT items? fiscal device requirement?",
+    "Rounding policy for cash in birr (exact santim vs whole birr)"
+  ],
+  "next_executable_step": "M2 slice 1: (a) business-date model so shifts can cross midnight (G-07); (b) refund to original tender (RET-POS-014); (c) approval lockout (R-08); then a branch-continuity journal spike. Start by re-running scripts/dev_setup.sh and the M1 suite to confirm the checkpoint."
+}

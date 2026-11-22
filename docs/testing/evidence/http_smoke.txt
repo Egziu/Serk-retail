@@ -1,0 +1,9 @@
+POS-OPE-2026-00001 {'Cash': 0.0}
+login receiver@serk.test -> 200
+login cashier1@serk.test -> 200
+receive:      OK {"reference_name": "MAT-PRE-2026-00002", "grand_total": 576.0, "status": "received", "idempotent_replay": false}
+open_shift:   OK POS-OPE-2026-00002
+sale #1:      OK {"reference_name": "ACC-SINV-2026-00001", "grand_total": 57.5, "change_amount": 42.5, "status": "completed", "idempotent_replay": false}
+sale #2 same: OK {"change_amount": 42.5, "grand_total": 57.5, "reference_name": "ACC-SINV-2026-00001", "status": "completed", "idempotent_replay": true}
+client price: ERR InvalidRequest - Client-supplied prices are not accepted.
+close:        OK {"reference_name": "POS-CLO-2026-00002", "variances": {"Cash": 0.0}, "grand_total": 57.5, "status": "closed", "idempotent_replay": false}
