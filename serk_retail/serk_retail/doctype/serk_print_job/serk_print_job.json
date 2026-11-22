@@ -1,0 +1,167 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "creation": "2026-11-22 09:00:00.000000",
+ "description": "Persistent receipt print job. Physical exactly-once output is not guaranteed; states distinguish what is known.",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "sales_invoice",
+  "pos_profile",
+  "status",
+  "is_copy",
+  "copy_number",
+  "adapter",
+  "receipt_width",
+  "attempts",
+  "last_error",
+  "drawer_pulse_requested",
+  "drawer_pulse_attempted_at",
+  "payload_hash",
+  "rendered_text",
+  "requested_by",
+  "reason"
+ ],
+ "fields": [
+  {
+   "fieldname": "sales_invoice",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Sales Invoice",
+   "options": "Sales Invoice",
+   "reqd": 1
+  },
+  {
+   "fieldname": "pos_profile",
+   "fieldtype": "Link",
+   "label": "Pos Profile",
+   "options": "POS Profile"
+  },
+  {
+   "default": "Queued",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Queued\nSpooled\nAcknowledged\nFailed\nDelivery Unknown"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_copy",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Is Copy"
+  },
+  {
+   "default": "0",
+   "fieldname": "copy_number",
+   "fieldtype": "Int",
+   "label": "Copy Number"
+  },
+  {
+   "fieldname": "adapter",
+   "fieldtype": "Data",
+   "label": "Adapter"
+  },
+  {
+   "default": "48",
+   "fieldname": "receipt_width",
+   "fieldtype": "Int",
+   "label": "Receipt Width"
+  },
+  {
+   "default": "0",
+   "fieldname": "attempts",
+   "fieldtype": "Int",
+   "label": "Attempts"
+  },
+  {
+   "fieldname": "last_error",
+   "fieldtype": "Small Text",
+   "label": "Last Error"
+  },
+  {
+   "default": "0",
+   "fieldname": "drawer_pulse_requested",
+   "fieldtype": "Check",
+   "label": "Drawer Pulse Requested"
+  },
+  {
+   "fieldname": "drawer_pulse_attempted_at",
+   "fieldtype": "Datetime",
+   "label": "Drawer Pulse Attempted At"
+  },
+  {
+   "fieldname": "payload_hash",
+   "fieldtype": "Data",
+   "label": "Payload Hash"
+  },
+  {
+   "fieldname": "rendered_text",
+   "fieldtype": "Long Text",
+   "label": "Rendered Text"
+  },
+  {
+   "fieldname": "requested_by",
+   "fieldtype": "Link",
+   "label": "Requested By",
+   "options": "User"
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Small Text",
+   "label": "Reason"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-11-22 09:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "SERK Retail",
+ "name": "SERK Print Job",
+ "naming_rule": "Random",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 0,
+   "delete": 0,
+   "email": 0,
+   "export": 0,
+   "print": 0,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 0,
+   "write": 0
+  },
+  {
+   "create": 0,
+   "delete": 0,
+   "email": 0,
+   "export": 0,
+   "print": 0,
+   "read": 1,
+   "report": 1,
+   "role": "SERK Store Manager",
+   "share": 0,
+   "write": 0
+  },
+  {
+   "create": 0,
+   "delete": 0,
+   "email": 0,
+   "export": 0,
+   "print": 0,
+   "read": 1,
+   "report": 0,
+   "role": "SERK Shift Supervisor",
+   "share": 0,
+   "write": 0
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0
+}

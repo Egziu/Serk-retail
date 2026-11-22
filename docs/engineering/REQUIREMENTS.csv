@@ -1,0 +1,36 @@
+id,requirement,phase,status,implementation,evidence
+RET-M1-001,Receive stock -> sell -> receipt -> return -> close -> reconcile end-to-end with balanced GL and correct stock,M1,tested,api/inventory.py; api/pos.py; core/reconciliation.py,tests/test_m1_flow.py::test_01
+RET-INV-001,Receiving posts Purchase Receipt with stock and GL effects,M1,tested,api/inventory.py::receive_stock,test_01
+RET-POS-001,Open shift with opening float on an assigned register,M1,tested,api/pos.py::open_shift,test_01; test_07
+RET-POS-002,Barcode lookup preserves leading zeros; unknown barcode rejected clearly,M1,tested,api/pos.py::_resolve_item,test_09
+RET-POS-003,Client-supplied prices are rejected; prices from price list,M1,tested,api/pos.py::_validate_lines,test_09
+RET-POS-004,Decimal quantities for weighted goods,M1,tested,api/pos.py,test_01 (1.25 kg)
+RET-POS-005,Same idempotency key returns original result,M1,tested,core/idempotency.py,test_02; mutation_check
+RET-POS-006,Same key with different payload rejected,M1,tested,core/idempotency.py,test_03
+RET-POS-007,Concurrent duplicate requests create exactly one sale,M1,tested,core/idempotency.py,test_04; mutation_check
+RET-POS-008,Blind close; variance over tolerance requires reason; variance recorded,M1,tested,api/pos.py::close_shift,test_01; test_11
+RET-POS-009,Insufficient payment rejected at exact boundary,M1,tested,api/pos.py::submit_sale,test_09
+RET-POS-010,Refund cannot exceed remaining entitlement,M1,tested,api/pos.py::submit_return,test_05
+RET-POS-011,Concurrent refunds cannot exceed entitlement,M1,tested,api/pos.py::submit_return (row lock + locking read),test_13
+RET-POS-012,Partial return keeps original price and tax,M1,tested,erpnext make_return_doc + api/pos.py,test_01
+RET-POS-013,Failed sale (e.g. stock shortfall) leaves no partial state,M1,tested,transaction atomicity,test_10
+RET-POS-014,Refund to original tender,M2,planned,,
+RET-POS-020,Shifts spanning midnight / business date,M2,planned,,GAP G-07
+RET-PRC-001,VAT computed on net total (synthetic 15% exclusive),M1,tested,ERPNext taxes + seed template,test_01
+RET-PRC-002,Supervisor price override with audit,M3,planned,,
+RET-HW-001,Persistent print job lifecycle with distinct states,M1,simulated,core/receipts.py,test_01; test_08
+RET-HW-002,Print failure never reverses the sale,M1,simulated,core/receipts.py,test_08
+RET-HW-003,Drawer pulse at most once per sale; none on retry/reprint,M1,simulated,core/receipts.py,test_08
+RET-HW-004,Reprints labelled COPY and audited,M1,simulated,api/pos.py::reprint_receipt,test_08
+RET-HW-005,Physical receipt printer qualification,M2,blocked,,No hardware available
+RET-SEC-001,Server-side role and register checks,M1,tested,core/authz.py,test_07
+RET-SEC-002,Separation of duties for refunds,M1,tested,core/authz.py::verify_approver,test_06
+RET-SEC-003,Refusals audited,M1,tested,core/audit.py::log_refusal_and_raise,test_06
+RET-SEC-005,Audit events append-only through the app,M1,tested,doctype/serk_audit_event,test_12
+RET-SEC-008,Approval brute-force protection,M2,planned,,R-08
+RET-SEC-010,SBOM and dependency scanning,M2,planned,,
+RET-TEN-001,Tenant isolation by site/database,M4,designed,docs/architecture/DECISIONS.md ADR-006,
+RET-OFF-001,Durable offline checkout journal,M2,planned,,
+RET-FIS-001,Ethiopian fiscal/VAT compliance,M2+,blocked,,Needs fiscal requirements and authority approval
+RET-L10N-003,Ethiopian calendar presentation,M3,planned,,
+RET-AI-001,Provider-neutral AI gateway,M5,planned,,

@@ -1,0 +1,42 @@
+# SERK Retail CI — AUTHORED, NOT YET EXECUTED on GitHub (no repository push was made).
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env: { MARIADB_ROOT_PASSWORD: ci-throwaway-root }
+        ports: ["3306:3306"]
+        options: --health-cmd="healthcheck.sh --connect" --health-interval=5s --health-retries=20
+      redis: { image: "redis:7", ports: ["6379:6379"] }
+    steps:
+      - uses: actions/checkout@v4
+        with: { path: serk_retail }
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.14" }
+      - uses: actions/setup-node@v4
+        with: { node-version: "24" }
+      - name: Lint
+        run: pip install ruff && ruff check serk_retail/serk_retail
+      - name: Bench with pinned Frappe/ERPNext
+        run: |
+          pip install frappe-bench
+          git clone --filter=blob:none https://github.com/frappe/frappe ~/frappe-src
+          git -C ~/frappe-src branch -f serk-pin fdb29e699921b59d895586b3dbea3e61baedf137
+          git clone --filter=blob:none https://github.com/frappe/erpnext ~/erpnext-src
+          git -C ~/erpnext-src branch -f serk-pin 20b97fa800c5548da786ced57111f51c858aea36
+          bench init --frappe-path ~/frappe-src --frappe-branch serk-pin --skip-assets --skip-redis-config-generation ~/bench
+          cd ~/bench && bench get-app --branch serk-pin --skip-assets ~/erpnext-src && bench get-app --skip-assets $GITHUB_WORKSPACE/serk_retail
+          ./env/bin/pip install unittest-xml-reporting freezegun
+          bench set-config -g redis_cache redis://127.0.0.1:6379 && bench set-config -g redis_queue redis://127.0.0.1:6379
+          bench new-site ci.localhost --db-host 127.0.0.1 --db-root-username root --db-root-password ci-throwaway-root \
+            --admin-password ci-throwaway-admin --install-app erpnext --install-app serk_retail
+          bench --site ci.localhost set-config allow_tests true
+      - name: M1 acceptance tests + mutation check
+        run: |
+          cd ~/bench
+          bench --site ci.localhost run-tests --module serk_retail.tests.test_m1_flow --junit-xml-output m1.xml
+          bench --site ci.localhost execute serk_retail.tests.mutation_check.run | tee mutation.log
+          grep -q "MUTANT KILLED" mutation.log

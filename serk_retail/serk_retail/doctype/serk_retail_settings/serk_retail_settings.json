@@ -1,0 +1,96 @@
+{
+ "actions": [],
+ "creation": "2026-11-22 09:00:00.000000",
+ "description": "Store-level SERK Retail configuration. Fiscal and tax policy are NOT chosen here.",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "store_display_name",
+  "receipt_footer",
+  "receipt_width_chars",
+  "printer_adapter",
+  "cash_variance_tolerance",
+  "require_approval_for_returns"
+ ],
+ "fields": [
+  {
+   "default": "SERK Demo Mart",
+   "fieldname": "store_display_name",
+   "fieldtype": "Data",
+   "label": "Store Display Name"
+  },
+  {
+   "default": "Thank you. Innovation with Integrity.",
+   "fieldname": "receipt_footer",
+   "fieldtype": "Small Text",
+   "label": "Receipt Footer"
+  },
+  {
+   "default": "48",
+   "description": "32 = 58 mm, 48 = 80 mm (Font A).",
+   "fieldname": "receipt_width_chars",
+   "fieldtype": "Select",
+   "label": "Receipt Width Chars",
+   "options": "32\n48"
+  },
+  {
+   "default": "Simulated ESC/POS",
+   "description": "Only the simulator exists in M1. No physical printer is qualified.",
+   "fieldname": "printer_adapter",
+   "fieldtype": "Select",
+   "label": "Printer Adapter",
+   "options": "Simulated ESC/POS\nDisabled"
+  },
+  {
+   "default": "0",
+   "description": "Absolute cash variance at shift close above which a reason is mandatory.",
+   "fieldname": "cash_variance_tolerance",
+   "fieldtype": "Currency",
+   "label": "Cash Variance Tolerance"
+  },
+  {
+   "default": "1",
+   "fieldname": "require_approval_for_returns",
+   "fieldtype": "Check",
+   "label": "Require Approval For Returns"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-11-22 09:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "SERK Retail",
+ "name": "SERK Retail Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 0,
+   "export": 0,
+   "print": 0,
+   "read": 1,
+   "report": 0,
+   "role": "System Manager",
+   "share": 0,
+   "write": 1
+  },
+  {
+   "create": 0,
+   "delete": 0,
+   "email": 0,
+   "export": 0,
+   "print": 0,
+   "read": 1,
+   "report": 0,
+   "role": "SERK Store Manager",
+   "share": 0,
+   "write": 0
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0
+}
