@@ -21,7 +21,7 @@
 | Ethiopian fiscal/VAT compliance (incl. fiscal device / e-invoice) | **Blocked** | Requirements + authority guidance; VAT 15% here is synthetic |
 | Card / mobile-money tenders | **Blocked** | Provider specs, sandbox credentials |
 | Offline checkout (M2) | **Planned** | — |
-| Cashier UI | **Planned** | Upstream desk POS works for Administrator-class users only; SERK UI not built |
+| Cashier UI | **Planned** | SERK cashier UI not built; upstream desk POS UI not exercised (assets not built in this environment) |
 | Benchmark matrix | **Not started** | — |
 | CI | **Authored, not executed** | Push to a GitHub repo |
 | Production readiness | **No** | M2–M6 gates |
