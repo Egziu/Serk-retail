@@ -30,8 +30,10 @@ sudo mariadb -e "ALTER USER 'root'@'localhost' IDENTIFIED VIA unix_socket OR mys
 python3.14 -m pip install --user frappe-bench
 git clone --filter=blob:none https://github.com/frappe/frappe ~/frappe-src
 git -C ~/frappe-src branch -f serk-pin-fdb29e69 $FRAPPE_COMMIT
+git -C ~/frappe-src checkout -q serk-pin-fdb29e69   # fetch the pinned blobs (partial clone)
 git clone --filter=blob:none https://github.com/frappe/erpnext ~/erpnext-src
 git -C ~/erpnext-src branch -f serk-pin-20b97fa8 $ERPNEXT_COMMIT
+git -C ~/erpnext-src checkout -q serk-pin-20b97fa8
 
 bench init --frappe-path ~/frappe-src --frappe-branch serk-pin-fdb29e69 --python "$(command -v python3.14)" \
   --skip-assets --skip-redis-config-generation "$BENCH_DIR"

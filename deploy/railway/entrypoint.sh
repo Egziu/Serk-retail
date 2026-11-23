@@ -65,8 +65,10 @@ if [ ! -d "sites/$SITE_NAME" ]; then
 		--install-app erpnext --install-app serk_retail --set-default
 	if [ "${SERK_DEMO_SEED}" = "1" ]; then
 		log "loading FICTIONAL demo data (SERK Demo Mart)"
-		( cd "$BENCH" && HOME="$DATA_DIR/secrets" bench --site "$SITE_NAME" execute serk_retail.setup.demo.seed >/dev/null )
-		mv -f "$DATA_DIR/secrets/.serk_demo_credentials" "$DATA_DIR/secrets/demo_user_credentials" 2>/dev/null || true
+		# Keep HOME=/home/frappe: bench is a pip --user install, so a different HOME hides it
+		# from Python. The seed writes ~/.serk_demo_credentials (0600); move it to the volume.
+		bench --site "$SITE_NAME" execute serk_retail.setup.demo.seed >/dev/null
+		mv -f "$HOME/.serk_demo_credentials" "$DATA_DIR/secrets/demo_user_credentials"
 	fi
 	log "site created; credentials are in $DATA_DIR/secrets/ (not logged)"
 fi
