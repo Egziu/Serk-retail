@@ -5,6 +5,7 @@
 # Optional env:  DB_PORT (3306), SITE_NAME (serk-demo.local), PUBLIC_URL, PORT (8000),
 #                SERK_DEMO_SEED (1 = load fictional demo data on first boot),
 #                DATA_DIR (/data, a persistent volume), GUNICORN_WORKERS (2)
+#                SERK_ADMIN_PASSWORD (optional first-boot password; otherwise generated)
 # Secrets: the Administrator password and demo-user passwords are generated on first boot and
 # written ONLY to $DATA_DIR/secrets/ (0600). They are never printed to the logs.
 set -euo pipefail
@@ -24,7 +25,7 @@ if [ "$(id -u)" = "0" ]; then
 		DATA_DIR="$DATA_DIR" SITE_NAME="$SITE_NAME" DB_HOST="${DB_HOST:?DB_HOST is required}" DB_PORT="$DB_PORT" \
 		DB_ROOT_PASSWORD="${DB_ROOT_PASSWORD:?DB_ROOT_PASSWORD is required}" REDIS_URL="${REDIS_URL:?REDIS_URL is required}" \
 		PUBLIC_URL="${PUBLIC_URL:-}" PORT="$PORT" SERK_DEMO_SEED="${SERK_DEMO_SEED:-1}" \
-		GUNICORN_WORKERS="${GUNICORN_WORKERS:-2}" HOME=/home/frappe PATH="/home/frappe/.local/bin:/usr/local/bin:/usr/bin:/bin" \
+		SERK_ADMIN_PASSWORD="${SERK_ADMIN_PASSWORD:-}" GUNICORN_WORKERS="${GUNICORN_WORKERS:-2}" HOME=/home/frappe PATH="/home/frappe/.local/bin:/usr/local/bin:/usr/bin:/bin" \
 		"$0"
 fi
 
@@ -58,7 +59,13 @@ umask 077
 ADMIN_PW_FILE="$DATA_DIR/secrets/administrator_password"
 if [ ! -d "sites/$SITE_NAME" ]; then
 	log "first boot: creating site $SITE_NAME (this takes a few minutes)"
-	[ -f "$ADMIN_PW_FILE" ] || python3 -c "import secrets;print(secrets.token_urlsafe(18))" > "$ADMIN_PW_FILE"
+	if [ ! -f "$ADMIN_PW_FILE" ]; then
+		if [ -n "${SERK_ADMIN_PASSWORD:-}" ]; then
+			printf '%s\n' "$SERK_ADMIN_PASSWORD" > "$ADMIN_PW_FILE"
+		else
+			python3 -c "import secrets;print(secrets.token_urlsafe(18))" > "$ADMIN_PW_FILE"
+		fi
+	fi
 	bench new-site "$SITE_NAME" --db-host "$DB_HOST" --db-port "$DB_PORT" \
 		--db-root-username root --db-root-password "$DB_ROOT_PASSWORD" \
 		--mariadb-user-host-login-scope='%' --admin-password "$(cat "$ADMIN_PW_FILE")" \
@@ -85,7 +92,7 @@ bench worker --queue short,default,long &
 bench schedule &
 (cd sites && exec ../env/bin/gunicorn --bind "0.0.0.0:$PORT" --workers "${GUNICORN_WORKERS}" \
 	--timeout 120 --graceful-timeout 30 --worker-tmp-dir /dev/shm \
-	--access-logfile - --error-logfile - frappe.app:application --preload) &
+	--access-logfile - --error-logfile - 'frappe.app:application_with_statics()' --preload) &
 # If any process exits, exit the container so Railway restarts it.
 wait -n
 log "a process exited; stopping container"
