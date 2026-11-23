@@ -11,7 +11,7 @@ ENV DEBIAN_FRONTEND=noninteractive PIP_DISABLE_PIP_VERSION_CHECK=1 PYTHONUNBUFFE
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
 		git curl ca-certificates xz-utils build-essential pkg-config libmariadb-dev mariadb-client \
-		libffi-dev libssl-dev libjpeg62-turbo-dev zlib1g-dev fonts-dejavu-core util-linux cron \
+		libffi-dev libssl-dev libjpeg62-turbo-dev zlib1g-dev fonts-dejavu-core util-linux cron procps \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& curl -fsSL https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz \
 		| tar -xJ -C /usr/local --strip-components=1 \

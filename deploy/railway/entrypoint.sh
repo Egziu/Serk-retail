@@ -101,7 +101,8 @@ bench --site "$SITE_NAME" enable-scheduler >/dev/null || true
 log "starting worker, scheduler and web on :$PORT"
 bench worker --queue short,default,long &
 bench schedule &
-(cd sites && exec ../env/bin/gunicorn --bind "0.0.0.0:$PORT" --workers "${GUNICORN_WORKERS}" \
+# sites is a symlink to the volume, so a relative ../env would resolve under $DATA_DIR: use $BENCH.
+(cd sites && exec "$BENCH/env/bin/gunicorn" --bind "0.0.0.0:$PORT" --workers "${GUNICORN_WORKERS}" \
 	--timeout 120 --graceful-timeout 30 --worker-tmp-dir /dev/shm \
 	--access-logfile - --error-logfile - --pythonpath /home/frappe/serk-deploy serk_wsgi:application --preload) &
 # If any process exits, exit the container so Railway restarts it.
