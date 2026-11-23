@@ -10,7 +10,7 @@ ARG NODE_VERSION=24.22.3
 ENV DEBIAN_FRONTEND=noninteractive PIP_DISABLE_PIP_VERSION_CHECK=1 PYTHONUNBUFFERED=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-		git curl ca-certificates xz-utils build-essential pkg-config libmariadb-dev mariadb-client \
+		cron git curl ca-certificates xz-utils build-essential pkg-config libmariadb-dev mariadb-client \
 		libffi-dev libssl-dev libjpeg62-turbo-dev zlib1g-dev fonts-dejavu-core util-linux \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& curl -fsSL https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz \
