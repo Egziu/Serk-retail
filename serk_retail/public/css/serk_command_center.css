@@ -120,9 +120,11 @@
 .serk-donut .dc-top { font-size: 15px; font-weight: 650; fill: var(--serk-ink); }
 .serk-donut .dc-bottom { font-size: 10.5px; fill: #8a9b99; }
 .serk-legend { display: none; }
-.serk-hbar { display: grid; grid-template-columns: minmax(0, 1.1fr) 1.4fr auto; gap: 10px; align-items: center; padding: 5px 0; }
-.serk-hbar .lbl { display: flex; gap: 6px; align-items: center; min-width: 0; font-size: 12.8px; }
-.serk-hbar .lbl span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.serk-hbar { display: grid; grid-template-columns: minmax(120px, 1.3fr) minmax(60px, 1fr) auto auto; gap: 10px; align-items: center; padding: 6px 0; }
+.serk-hbar .lbl { min-width: 0; font-size: 12.8px; }
+.serk-hbar .lbl span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.serk-hbar .lbl small { display: block; font-size: 11px; color: #8a9b99; }
+.serk-hbar .chp { min-width: 52px; text-align: right; }
 .serk-hbar .track { height: 8px; background: #eef3f1; border-radius: 99px; overflow: hidden; }
 .serk-hbar .track i { display: block; height: 100%; border-radius: 99px; }
 .serk-hbar .val { font-size: 12.5px; font-weight: 600; font-variant-numeric: tabular-nums; }

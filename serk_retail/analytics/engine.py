@@ -159,8 +159,10 @@ def _compute(company, days, horizon):
 	wd = [d.weekday() for d in model_dates]
 	f = fc.forecast_daily(y, wd, horizon, today.weekday()) if model_dates else fc.forecast_daily([], [], horizon, 0)
 	f_dates = [str(add_days(today, h)) for h in range(horizon)]
+	# Completed days only: today is still trading, the forecast line starts at today.
 	daily = [{"date": str(d), "revenue": round(by_day.get(d, 0.0), 2), "transactions": tx_day.get(d, 0)}
-			 for d in _date_range(getdate(start), today)]
+			 for d in _date_range(getdate(start), add_days(today, -1))]
+	kpis["today_so_far"] = round(by_day.get(today, 0.0), 2)
 
 	# Anomalies: residual vs weekday-seasonal level over the window.
 	anomalies = []
@@ -323,8 +325,12 @@ def derive_insights(d: dict) -> list[dict]:
 	reo = [s for s in d["stock"] if s["status"] == "reorder"]
 	if crit or reo:
 		names = ", ".join(f"{s['item_name']} ({s['days_of_cover']}d)" for s in (crit + reo)[:4])
-		add("stock", "danger" if crit else "warn",
-			f"{len(crit)} item(s) will run out within the supplier lead time, {len(reo)} need reordering",
+		parts = []
+		if crit:
+			parts.append(f"{len(crit)} item{'s' if len(crit) > 1 else ''} will run out within the supplier lead time")
+		if reo:
+			parts.append(f"{len(reo)} item{'s' if len(reo) > 1 else ''} need{'' if len(reo) > 1 else 's'} reordering")
+		add("stock", "danger" if crit else "warn", "; ".join(parts).capitalize(),
 			f"Lowest cover: {names}. Suggested orders are on the stock panel (95% service level).", len(crit) + len(reo))
 	over = [s for s in d["stock"] if s["status"] == "overstock"]
 	if over:

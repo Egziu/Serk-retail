@@ -96,7 +96,8 @@ def forecast_daily(values, weekdays, horizon: int, start_weekday: int, damp: flo
 		base = level + phi_sum * trend
 		factor = idx[(start_weekday + h - 1) % 7]
 		point = max(base * factor, 0.0)
-		spread = Z80 * resid_sd * math.sqrt(h) * factor
+		# Daily retail errors are mostly day noise, not a random walk: widen gently with horizon.
+		spread = Z80 * resid_sd * math.sqrt(1 + h / 7) * factor
 		values_out.append(round(point, 2))
 		lower.append(round(max(point - spread, 0.0), 2))
 		upper.append(round(point + spread, 2))

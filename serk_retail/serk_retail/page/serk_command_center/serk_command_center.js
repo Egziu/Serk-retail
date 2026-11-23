@@ -20,6 +20,8 @@ class SerkCommandCenter {
 	async init() {
 		const ui = (this.ui = window.serk_ui);
 		const b = window.serk_brand || frappe.boot.serk_brand || {};
+		const analyst = ["System Manager", "SERK Store Manager", "SERK Shift Supervisor"].some((r) => frappe.user.has_role(r));
+		if (!analyst) return this.staffHome(b);
 		this.$root.html(`
 		<section class="serk-hero">
 			<div class="serk-hero-grid" aria-hidden="true"></div>
@@ -71,6 +73,31 @@ class SerkCommandCenter {
 			return;
 		}
 		this.load();
+	}
+
+	// Cashiers and receivers: a focused home with their registers and allowed actions.
+	async staffHome(b) {
+		const ui = this.ui;
+		const regs = await frappe.db
+			.get_list("POS Profile", { filters: [["POS Profile User", "user", "=", frappe.session.user]], fields: ["name as parent"], limit: 20 })
+			.catch(() => []);
+		const cashier = frappe.user.has_role("SERK Cashier");
+		const actions = cashier
+			? [[__("Shifts"), "/app/pos-opening-entry"], [__("Sales & returns"), "/app/sales-invoice"], [__("Shift closing"), "/app/pos-closing-entry"]]
+			: [[__("Goods received"), "/app/purchase-receipt"], [__("Products"), "/app/item"]];
+		this.$root.html(`
+		<section class="serk-hero">
+			<div class="serk-hero-grid" aria-hidden="true"></div>
+			<div class="serk-hero-row"><div class="serk-hero-id"><img src="${ui.esc(b.logo_url)}" alt="" />
+				<div><small>${ui.esc(b.display_name || b.product_name)}</small><h1>${__("Welcome, {0}", [ui.esc(frappe.session.user_fullname || "")])}</h1></div></div></div>
+			<div class="serk-hero-meta"><span class="live-dot"></span><span>${cashier ? __("Cashier workspace") : __("Receiving workspace")}</span></div>
+		</section>
+		<section class="serk-grid">
+			<article class="serk-card span-6"><header><div><h3>${__("Your registers")}</h3><small>${__("Assigned by your store manager")}</small></div></header>
+				<div class="serk-list">${regs.length ? regs.map((r) => `<div class="serk-list-row"><b>${ui.esc(r.parent)}</b></div>`).join("") : `<div class="serk-empty">${__("No register assigned")}</div>`}</div></article>
+			<article class="serk-card span-6"><header><div><h3>${__("Quick actions")}</h3><small>${__("Sales and returns go through the SERK checkout API")}</small></div></header>
+				<div class="serk-list">${actions.map(([l, u]) => `<a class="serk-list-row" href="${u}"><b>${l} →</b></a>`).join("")}</div></article>
+		</section>`);
 	}
 
 	setSeg() {
@@ -163,7 +190,7 @@ class SerkCommandCenter {
 			st.length ? st.map((s) => {
 				const cover = s.days_of_cover == null ? 0 : Math.min(s.days_of_cover / 30, 1);
 				return `<div class="serk-stock-row ${s.status}">
-					<div class="nm"><b>${ui.esc(s.item_name)}</b><small>${ui.num(s.on_hand, 1)} ${ui.esc(s.uom || "")} ${__("on hand")} · ${ui.num(s.demand_daily, 1)}/${__("day")}</small></div>
+					<div class="nm"><b>${ui.esc(s.item_name)}</b><small>${ui.num(s.on_hand, s.on_hand % 1 ? 1 : 0)} ${ui.esc(s.uom || "")} ${__("on hand")} · ${ui.num(s.demand_daily, 1)}/${__("day")}</small></div>
 					<div class="gauge"><i style="width:${(cover * 100).toFixed(0)}%"></i></div>
 					<div class="dc"><b>${s.days_of_cover == null ? "—" : ui.num(s.days_of_cover, 1)}</b><small>${__("days")}</small></div>
 					<div class="act">${s.suggested_order ? `${__("Order")} <b>${ui.num(s.suggested_order)}</b>` : `<span class="tag">${ui.esc(__(s.status))}</span>`}</div>
@@ -180,7 +207,7 @@ class SerkCommandCenter {
 
 		ui.hbars(this.$root.find(".serk-regs")[0], d.registers.map((r) => ({
 			label: r.register, value: r.revenue, display: ui.money(r.revenue, cur, true),
-			chip: `<em class="chip">${r.transactions} ${__("tx")} · ${ui.money(r.avg_basket, cur, true)}</em>`,
+			sub: `${r.transactions} ${__("transactions")} · ${__("basket")} ${ui.money(r.avg_basket, cur)}`,
 		})), { color: col[3] || col[0] });
 
 		this.$root.find(".serk-team").html(this.table(

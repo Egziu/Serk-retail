@@ -22,44 +22,44 @@ from frappe.utils import add_days, flt, getdate, nowdate
 from serk_retail.setup import demo
 
 MARKER = "SERK demo history"
-# code, name, group, uom, price, cost, daily_units, stock_factor (cover at the end: <1 runs short)
+# code, name, group, uom, price, cost, daily_units, cover_factor (weekly top-up to 14 x factor days of cover)
 CATALOG = [
 	("SERK-WATER-500", "Bottled Water 500 ml", "Beverages", "Nos", 25, 12, 30, 1.6),
-	("SERK-WATER-2L", "Bottled Water 2 L", "Beverages", "Nos", 55, 34, 9, 1.4),
-	("SERK-AMBO-500", "Sparkling Mineral Water 500 ml", "Beverages", "Nos", 35, 22, 10, 1.3),
-	("SERK-COLA-500", "Cola 500 ml", "Beverages", "Nos", 45, 31, 14, 1.2),
-	("SERK-JUICE-1L", "Mango Juice 1 L", "Beverages", "Nos", 120, 84, 4, 3.4),
-	("SERK-COFFEE-500", "Roasted Coffee Beans 500 g", "Coffee & Tea", "Nos", 420, 300, 5, 1.05),
-	("SERK-TEA-100", "Black Tea Leaves 100 g", "Coffee & Tea", "Nos", 85, 55, 4, 1.5),
-	("SERK-SUGAR-1KG", "Sugar 1 kg", "Grocery", "Nos", 150, 118, 9, 1.08),
-	("SERK-INJERA-5", "Injera pack of 5", "Bakery & Injera", "Nos", 60, 38, 26, 1.3),
-	("SERK-BREAD", "Bread Loaf", "Bakery & Injera", "Nos", 45, 28, 18, 1.4),
+	("SERK-WATER-2L", "Bottled Water 2 L", "Beverages", "Nos", 55, 34, 9, 1.6),
+	("SERK-AMBO-500", "Sparkling Mineral Water 500 ml", "Beverages", "Nos", 35, 22, 10, 1.6),
+	("SERK-COLA-500", "Cola 500 ml", "Beverages", "Nos", 45, 31, 14, 1.6),
+	("SERK-JUICE-1L", "Mango Juice 1 L", "Beverages", "Nos", 120, 84, 4, 7.0),
+	("SERK-COFFEE-500", "Roasted Coffee Beans 500 g", "Coffee & Tea", "Nos", 420, 300, 5, 0.85),
+	("SERK-TEA-100", "Black Tea Leaves 100 g", "Coffee & Tea", "Nos", 85, 55, 4, 1.6),
+	("SERK-SUGAR-1KG", "Sugar 1 kg", "Grocery", "Nos", 150, 118, 9, 0.9),
+	("SERK-INJERA-5", "Injera pack of 5", "Bakery & Injera", "Nos", 60, 38, 26, 1.6),
+	("SERK-BREAD", "Bread Loaf", "Bakery & Injera", "Nos", 45, 28, 18, 1.6),
 	("SERK-DABOKOLO", "Dabo Kolo 250 g", "Bakery & Injera", "Nos", 70, 42, 5, 1.6),
-	("SERK-BISCUIT", "Biscuits", "Snacks", "Nos", 40, 26, 8, 1.5),
-	("SERK-TEFF-KG", "White Teff Flour (per kg)", "Grains & Flour", "Kg", 140, 105, 12, 1.1),
-	("SERK-WHEAT-5KG", "Wheat Flour 5 kg", "Grains & Flour", "Nos", 520, 430, 2, 1.7),
+	("SERK-BISCUIT", "Biscuits", "Snacks", "Nos", 40, 26, 8, 1.6),
+	("SERK-TEFF-KG", "White Teff Flour (per kg)", "Grains & Flour", "Kg", 140, 105, 12, 0.95),
+	("SERK-WHEAT-5KG", "Wheat Flour 5 kg", "Grains & Flour", "Nos", 520, 430, 2, 1.6),
 	("SERK-RICE-1KG", "Rice 1 kg", "Grains & Flour", "Nos", 165, 128, 4, 1.6),
-	("SERK-MISIR-1KG", "Red Lentils (Misir) 1 kg", "Grains & Flour", "Nos", 190, 150, 4, 1.4),
-	("SERK-SHIRO-500", "Shiro Powder 500 g", "Spices & Pulses", "Nos", 160, 110, 8, 0.98),
-	("SERK-PASTA-500", "Pasta 500 g", "Grains & Flour", "Nos", 75, 55, 7, 1.5),
-	("SERK-MILK-1L", "Fresh Milk 1 L", "Dairy & Eggs", "Nos", 95, 70, 11, 1.12),
-	("SERK-YOGHURT", "Yoghurt 500 ml", "Dairy & Eggs", "Nos", 85, 58, 5, 1.4),
-	("SERK-EGGS-12", "Eggs (12)", "Dairy & Eggs", "Nos", 150, 115, 6, 1.3),
-	("SERK-KIBE-250", "Spiced Butter (Kibe) 250 g", "Dairy & Eggs", "Nos", 260, 190, 3, 1.5),
-	("SERK-OIL-1L", "Cooking Oil 1 L", "Cooking Essentials", "Nos", 210, 172, 8, 1.2),
-	("SERK-OIL-5L", "Cooking Oil 5 L", "Cooking Essentials", "Nos", 980, 840, 1.5, 2.6),
-	("SERK-BERBERE", "Berbere 250 g", "Spices & Pulses", "Nos", 120, 78, 5, 1.4),
-	("SERK-SALT", "Salt 1 kg", "Cooking Essentials", "Nos", 30, 18, 4, 3.8),
-	("SERK-ONION-KG", "Red Onion (per kg)", "Fresh Produce", "Kg", 60, 38, 10, 1.15),
-	("SERK-TOMATO-KG", "Tomato (per kg)", "Fresh Produce", "Kg", 55, 34, 8, 1.25),
-	("SERK-DETERGENT", "Detergent Powder 1 kg", "Household", "Nos", 175, 128, 4, 1.5),
-	("SERK-DISHSOAP", "Dish Soap 500 ml", "Household", "Nos", 95, 62, 3, 1.7),
-	("SERK-TISSUE-4", "Toilet Tissue 4-pack", "Household", "Nos", 120, 85, 5, 1.4),
-	("SERK-SOAP", "Bath Soap", "Personal Care", "Nos", 45, 30, 7, 1.5),
-	("SERK-TOOTHPASTE", "Toothpaste", "Personal Care", "Nos", 90, 62, 3, 1.8),
-	("SERK-KOLO", "Roasted Barley (Kolo) 250 g", "Snacks", "Nos", 55, 34, 6, 1.4),
-	("SERK-PEANUT", "Roasted Peanuts 250 g", "Snacks", "Nos", 65, 42, 4, 1.5),
-	("SERK-CHOC", "Chocolate Bar", "Snacks", "Nos", 60, 40, 5, 1.3),
+	("SERK-MISIR-1KG", "Red Lentils (Misir) 1 kg", "Grains & Flour", "Nos", 190, 150, 4, 1.6),
+	("SERK-SHIRO-500", "Shiro Powder 500 g", "Spices & Pulses", "Nos", 160, 110, 8, 0.5),
+	("SERK-PASTA-500", "Pasta 500 g", "Grains & Flour", "Nos", 75, 55, 7, 1.6),
+	("SERK-MILK-1L", "Fresh Milk 1 L", "Dairy & Eggs", "Nos", 95, 70, 11, 0.55),
+	("SERK-YOGHURT", "Yoghurt 500 ml", "Dairy & Eggs", "Nos", 85, 58, 5, 1.6),
+	("SERK-EGGS-12", "Eggs (12)", "Dairy & Eggs", "Nos", 150, 115, 6, 1.6),
+	("SERK-KIBE-250", "Spiced Butter (Kibe) 250 g", "Dairy & Eggs", "Nos", 260, 190, 3, 1.6),
+	("SERK-OIL-1L", "Cooking Oil 1 L", "Cooking Essentials", "Nos", 210, 172, 8, 1.6),
+	("SERK-OIL-5L", "Cooking Oil 5 L", "Cooking Essentials", "Nos", 980, 840, 1.5, 6.5),
+	("SERK-BERBERE", "Berbere 250 g", "Spices & Pulses", "Nos", 120, 78, 5, 1.6),
+	("SERK-SALT", "Salt 1 kg", "Cooking Essentials", "Nos", 30, 18, 4, 7.5),
+	("SERK-ONION-KG", "Red Onion (per kg)", "Fresh Produce", "Kg", 60, 38, 10, 1.0),
+	("SERK-TOMATO-KG", "Tomato (per kg)", "Fresh Produce", "Kg", 55, 34, 8, 1.6),
+	("SERK-DETERGENT", "Detergent Powder 1 kg", "Household", "Nos", 175, 128, 4, 1.6),
+	("SERK-DISHSOAP", "Dish Soap 500 ml", "Household", "Nos", 95, 62, 3, 1.6),
+	("SERK-TISSUE-4", "Toilet Tissue 4-pack", "Household", "Nos", 120, 85, 5, 1.6),
+	("SERK-SOAP", "Bath Soap", "Personal Care", "Nos", 45, 30, 7, 1.6),
+	("SERK-TOOTHPASTE", "Toothpaste", "Personal Care", "Nos", 90, 62, 3, 4.0),
+	("SERK-KOLO", "Roasted Barley (Kolo) 250 g", "Snacks", "Nos", 55, 34, 6, 1.6),
+	("SERK-PEANUT", "Roasted Peanuts 250 g", "Snacks", "Nos", 65, 42, 4, 1.6),
+	("SERK-CHOC", "Chocolate Bar", "Snacks", "Nos", 60, 40, 5, 1.6),
 ]
 PAIRS = [
 	("SERK-COFFEE-500", "SERK-SUGAR-1KG", 0.55), ("SERK-INJERA-5", "SERK-SHIRO-500", 0.32),
@@ -142,18 +142,9 @@ def generate(days: int = 75, seed: int = 2026, base_invoices: int = 34) -> dict:
 	codes = [c[0] for c in CATALOG]
 	weights = [c[6] for c in CATALOG]
 
-	# Opening stock: one receipt the day before history starts, sized so some items run short.
-	pr = frappe.get_doc({"doctype": "Purchase Receipt", "company": demo.COMPANY, "supplier": demo.SUPPLIER,
-						 "set_posting_time": 1, "posting_date": add_days(start, -1), "posting_time": "07:00:00",
-						 "set_warehouse": warehouse, "remarks": MARKER,
-						 "items": [{"item_code": c[0], "qty": round(c[6] * days * 1.12 * c[7] + 5, 0), "rate": c[5],
-									"warehouse": warehouse} for c in CATALOG]})
-	pr.flags.ignore_permissions = True
-	pr.insert()
-	pr.submit()
-	frappe.db.commit()  # nosemgrep: frappe-manual-commit -- long generator, commit per stage
-
 	remaining = {c[0]: flt(frappe.db.get_value("Bin", {"item_code": c[0], "warehouse": warehouse}, "actual_qty")) for c in CATALOG}
+	sold_week = {c[0]: 0.0 for c in CATALOG}
+	receipts = 0
 	holiday = add_days(start, int(days * 0.55))  # festive spike
 	outage = add_days(start, int(days * 0.8))  # power outage dip
 	created, returns = 0, 0
@@ -166,6 +157,22 @@ def generate(days: int = 75, seed: int = 2026, base_invoices: int = 34) -> dict:
 			factor *= 1.85
 		if day == getdate(outage):
 			factor *= 0.45
+		# Weekly replenishment (Mondays and the first day): top up to 14 x cover_factor days of demand,
+		# estimated from last week's sales, like a store's standing order.
+		if i == 0 or day.weekday() == 0:
+			order = {}
+			for c in CATALOG:
+				daily = sold_week[c[0]] / 7 if i else c[6] * 0.55
+				target = max(daily, 0.3) * 14 * c[7]
+				qty = target - remaining[c[0]]
+				if qty > 0.5:
+					order[c[0]] = round(qty + 0.49) if c[3] != "Kg" else round(qty, 1)
+			if order:
+				_receive(warehouse, day, order, info)
+				for code, qty in order.items():
+					remaining[code] += qty
+				receipts += 1
+			sold_week = {c[0]: 0.0 for c in CATALOG}
 		n = max(round(base_invoices * factor), 3)
 		times = sorted(
 			dt.time(h, rng.randrange(60), rng.randrange(60))
@@ -185,6 +192,7 @@ def generate(days: int = 75, seed: int = 2026, base_invoices: int = 34) -> dict:
 				qty = round(rng.uniform(0.5, 2.5), 1) if info[code][3] == "Kg" else units * rng.choice([1, 1, 1, 2])
 				if remaining[code] >= qty:
 					remaining[code] -= qty
+					sold_week[code] += qty
 					lines.append((code, qty))
 			if not lines:
 				continue
@@ -204,7 +212,20 @@ def generate(days: int = 75, seed: int = 2026, base_invoices: int = 34) -> dict:
 		day = add_days(day, 1)
 	frappe.set_user("Administrator")
 	frappe.cache.delete_keys("serk_analytics:")
-	return {"invoices": created, "returns": returns, "from": str(start), "to": str(end)}
+	return {"invoices": created, "returns": returns, "receipts": receipts, "from": str(start), "to": str(end)}
+
+
+def _receive(warehouse, day, order: dict, info: dict):
+	frappe.set_user("receiver@serk.test")
+	pr = frappe.get_doc({"doctype": "Purchase Receipt", "company": demo.COMPANY, "supplier": demo.SUPPLIER,
+						 "set_posting_time": 1, "posting_date": day, "posting_time": "06:30:00",
+						 "set_warehouse": warehouse, "remarks": MARKER,
+						 "items": [{"item_code": code, "qty": qty, "rate": info[code][5], "warehouse": warehouse}
+								   for code, qty in order.items()]})
+	pr.flags.ignore_permissions = True
+	pr.insert()
+	pr.submit()
+	frappe.set_user("Administrator")
 
 
 def _return(si, cashier, day):

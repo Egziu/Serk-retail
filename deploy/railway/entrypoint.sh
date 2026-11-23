@@ -109,7 +109,9 @@ if [ "${SERK_DEMO_SEED}" = "1" ] && [ "${SERK_DEMO_HISTORY_DAYS:-0}" -gt 0 ] 2>/
 fi
 
 log "starting worker, scheduler and web on :$PORT"
-bench worker --queue short,default,long &
+# Separate long-queue worker so long jobs (demo history, reports) never delay receipt printing.
+bench worker --queue short,default &
+bench worker --queue long &
 bench schedule &
 # sites is a symlink to the volume, so a relative ../env would resolve under $DATA_DIR: use $BENCH.
 (cd sites && exec "$BENCH/env/bin/gunicorn" --bind "0.0.0.0:$PORT" --workers "${GUNICORN_WORKERS}" \

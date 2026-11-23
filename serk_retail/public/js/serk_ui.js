@@ -149,9 +149,9 @@
 		const color = opts.color || palette()[0];
 		el.innerHTML = rows.length
 			? rows.map((r) => `<div class="serk-hbar">
-				<div class="lbl"><span>${esc(r.label)}</span>${r.chip || ""}</div>
+				<div class="lbl"><span title="${esc(r.label)}">${esc(r.label)}</span>${r.sub ? `<small>${esc(r.sub)}</small>` : ""}</div>
 				<div class="track"><i style="width:${((r.value / max) * 100).toFixed(1)}%;background:${r.color || color}"></i></div>
-				<div class="val">${esc(r.display)}</div></div>`).join("")
+				<div class="val">${esc(r.display)}</div><div class="chp">${r.chip || ""}</div></div>`).join("")
 			: `<div class="serk-empty">${__("No data in this window")}</div>`;
 	}
 

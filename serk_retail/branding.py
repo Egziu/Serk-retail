@@ -60,7 +60,12 @@ def _load() -> dict:
 		if not valid_hex(brand[key]):
 			brand[key] = DEFAULTS[key]
 	palette = [c.strip() for c in str(brand["chart_palette"] or "").split(",") if valid_hex(c.strip())]
-	brand["chart_colors"] = palette or DEFAULTS["chart_palette"].split(",")
+	default_palette = DEFAULTS["chart_palette"].split(",")
+	if not palette or [c.upper() for c in palette] == [c.upper() for c in default_palette]:
+		# Palette not customised: lead with the brand's own colours so charts follow the brand.
+		palette = [brand["primary_color"], brand["accent_color"]] + [
+			c for c in default_palette[2:] if c.upper() not in (brand["primary_color"].upper(), brand["accent_color"].upper())]
+	brand["chart_colors"] = palette
 	brand["logo_url"] = brand["logo"] or MARK
 	brand["favicon_url"] = brand["favicon"] or brand["logo"] or FAVICON
 	brand["display_name"] = brand["company_display_name"] or brand["legal_name"] or brand["product_name"]
