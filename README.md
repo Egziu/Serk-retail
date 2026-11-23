@@ -16,6 +16,35 @@ submission; append-only audit trail; print failure never affects the sale; no se
 All accounting and stock posting is done by ERPNext's own Sales Invoice / Purchase Receipt /
 POS Closing logic. SERK never writes ledger tables. ERPNext and Frappe are unmodified.
 
+## SERK platform layer (2026-11-23)
+
+* **SERK identity everywhere** — login, apps screen, rail, favicon, splash, tab titles, web and
+  email footers show the company's brand, never upstream product names. Configured in
+  **SERK Brand Settings** (name, legal name, motto, logo, favicon, primary/accent/sidebar/background
+  colours, sidebar style, corner style, chart palette, contacts). Defaults follow the SERK family
+  palette shared with SERK Finance (`#166453` primary, `#153335` sidebar). Done through documented
+  extension points only (settings, `extend_bootinfo`, `update_website_context`, template precedence).
+* **Command Center** (`/desk/serk-command-center`) — live KPIs with deltas and sparklines; revenue
+  history plus a 14/30-day forecast (Holt trend + weekday seasonality) with an 80% band and a
+  holdout-backtest accuracy figure; weekday x hour heatmap; category momentum; product ABC and
+  ledger margins; stock intelligence (days of cover, stock-out, order-up-to at 95% service);
+  basket affinity (lift); register and cashier performance with refund-rate outliers; anomaly
+  detection; a rule-based insight feed that works without AI.
+* **AI Analyst** (`/desk/serk-ai-analyst`, also embedded in the Command Center) — executive
+  briefing, forecast & demand plan, market & category analysis, and grounded Q&A. Anthropic or
+  OpenAI, configured exactly like SERK Finance (`SERK_AI_PROVIDER`, `SERK_AI_MODEL`,
+  `SERK_AI_API_KEY`, `SERK_AI_BASE_URL`, or **SERK AI Settings**). The model receives aggregated
+  figures only (no customer data; cashiers pseudonymised), has no tools, cannot write, and every
+  call is audited. It has no live internet data: market analysis uses your category/basket trends
+  plus the market context you enter.
+* **Company Setup** (`/desk/serk-setup`) — progress checklist and guided creation of companies
+  (chart of accounts, Ethiopian or Gregorian fiscal year, VAT template, price list, walk-in
+  customer, cash tender, first store, brand), stores, registers with cashiers, and staff logins
+  with SERK roles (temporary password shown once). All actions audited.
+
+Upstream copyright and licence notices remain in the source (GPL-3.0 / MIT); only the user
+interface carries the SERK brand.
+
 ## Prerequisites
 
 | Component | Version used for evidence |
@@ -36,6 +65,7 @@ bench get-app <this repo>
 bench --site <site> install-app serk_retail
 bench --site <site> execute serk_retail.setup.demo.seed      # synthetic data only
 bench --site <disposable-site> run-tests --module serk_retail.tests.test_m1_flow
+bench --site <disposable-site> run-tests --module serk_retail.tests.test_platform
 bench --site <disposable-site> execute serk_retail.tests.mutation_check.run
 ```
 
@@ -61,6 +91,13 @@ bench new-site serktest.localhost --install-app erpnext --install-app serk_retai
 | `serk_retail.api.pos.retry_print_job` | Cashier/Supervisor | Retry a *definitely failed* job only |
 | `serk_retail.api.pos.close_shift` | Cashier (own) / Supervisor | Blind count, variance reason over tolerance |
 | `serk_retail.api.pos.reconcile_shift` | Supervisor / Manager | Independent GL/stock/cash checks |
+| `serk_retail.api.insights.dashboard` (GET) | Supervisor / Manager | Command Center analytics snapshot |
+| `serk_retail.api.insights.ai_brief` | Supervisor / Manager | AI briefing: `insights`, `forecast`, `market` |
+| `serk_retail.api.insights.ai_ask` | Supervisor / Manager | Grounded AI Q&A |
+| `serk_retail.api.setup.state` (GET) | Manager / System Manager | Setup checklist and inventory |
+| `serk_retail.api.setup.create_company` | System Manager | Company + retail defaults |
+| `serk_retail.api.setup.create_store` / `create_register` | Manager / System Manager | Stores and registers |
+| `serk_retail.api.setup.create_staff` | System Manager | Staff login with SERK role |
 
 Every mutating call takes an `idempotency_key`. Same key + same payload returns the original
 result (`idempotent_replay: true`); same key + different payload is rejected.

@@ -1,0 +1,29 @@
+{#- SERK Retail: replaces upstream "Sent via ERPNext" lines with the company's own footer. -#}
+{%- set serk_footer = serk_footer_line() -%}
+<div class="email-footer-container text-muted {% if email_account_footer or sender_address or serk_footer %}with-divider{% endif %}">
+	{% if email_account_footer %}
+	<div class="email-account-footer">
+		{{ email_account_footer }}
+	</div>
+	{% endif %}
+
+	{% if sender_address %}
+	<div class="sender-address">
+		{% for line in sender_address.splitlines(True) %}
+		<div>{{ line }}</div>
+		{% endfor %}
+	</div>
+	{% endif %}
+
+	<!--unsubscribe link here-->
+
+	<div class="email-pixel">
+		<!--email_open_check-->
+	</div>
+
+	{% if serk_footer %}
+	<div class="default-mail-footer">
+		<div>{{ serk_footer }}</div>
+	</div>
+	{% endif %}
+</div>

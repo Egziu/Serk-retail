@@ -1,0 +1,183 @@
+/* SERK Retail website + login styling (SERK family palette). */
+:root {
+	--serk-primary: #166453;
+	--serk-accent: #61ad98;
+	--serk-sidebar: #153335;
+	--serk-bg: #f6f8f7;
+	--serk-ink: #173b3c;
+	--serk-muted: #758584;
+}
+
+body {
+	background: var(--serk-bg);
+	color: var(--serk-ink);
+}
+.btn-primary,
+.btn.btn-primary {
+	background-color: var(--serk-primary) !important;
+	border-color: var(--serk-primary) !important;
+	color: #fff !important;
+}
+.es-button[data-variant="solid"],
+button[type="submit"].es-button {
+	background: var(--serk-primary) !important;
+	color: #fff !important;
+	border-color: var(--serk-primary) !important;
+}
+.es-button[data-variant="solid"]:hover {
+	filter: brightness(0.92);
+}
+.btn-primary:hover {
+	filter: brightness(0.92);
+}
+a {
+	color: var(--serk-primary);
+}
+.form-control:focus {
+	border-color: var(--serk-accent);
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--serk-accent) 35%, transparent);
+}
+
+/* ---------------------------------------------------------------- login split screen */
+body.serk-login {
+	min-height: 100vh;
+	padding-left: min(46vw, 640px);
+	background: #fff;
+}
+body.serk-login .page-card-head img,
+body.serk-login .app-logo {
+	display: none;
+}
+body.serk-login .for-login,
+body.serk-login .for-forgot,
+body.serk-login .for-login-with-email-link,
+body.serk-login .for-signup {
+	max-width: 400px;
+	margin: 18vh auto 0;
+}
+body.serk-login .page-card-head h4,
+body.serk-login .page-card-head .text-xl {
+	font-size: 28px;
+	font-weight: 620;
+	letter-spacing: -0.8px;
+	color: var(--serk-ink);
+}
+.serk-login-panel {
+	position: fixed;
+	inset: 0 auto 0 0;
+	width: min(46vw, 640px);
+	background:
+		radial-gradient(1100px 520px at -10% 110%, color-mix(in srgb, var(--serk-primary) 70%, transparent), transparent 60%),
+		radial-gradient(700px 420px at 120% -10%, color-mix(in srgb, var(--serk-accent) 35%, transparent), transparent 60%),
+		var(--serk-sidebar);
+	color: #eef6f4;
+	padding: 44px 52px;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	z-index: 1;
+}
+.serk-login-grid {
+	position: absolute;
+	inset: 0;
+	background-image:
+		linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+	background-size: 44px 44px;
+	mask-image: linear-gradient(180deg, transparent, #000 40%, #000 70%, transparent);
+	pointer-events: none;
+}
+.serk-login-brand {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	position: relative;
+	z-index: 2;
+}
+.serk-login-brand img {
+	width: 46px;
+	height: 46px;
+	border-radius: 12px;
+	object-fit: contain;
+}
+.serk-login-brand strong {
+	display: block;
+	font-size: 17px;
+	font-weight: 620;
+}
+.serk-login-brand span {
+	display: block;
+	font-size: 12.5px;
+	color: #a9c2bc;
+	letter-spacing: 0.4px;
+	text-transform: uppercase;
+}
+.serk-login-hero {
+	margin-top: auto;
+	margin-bottom: auto;
+	position: relative;
+	z-index: 2;
+}
+.serk-login-hero h1 {
+	font-size: clamp(26px, 2.6vw, 38px);
+	line-height: 1.18;
+	letter-spacing: -1.2px;
+	font-weight: 600;
+	max-width: 520px;
+	color: #fff;
+	margin: 0 0 28px;
+}
+.serk-login-hero ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: grid;
+	gap: 14px;
+}
+.serk-login-hero li {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	font-size: 15px;
+	color: #d6e6e1;
+}
+.serk-login-hero li span {
+	width: 9px;
+	height: 9px;
+	border-radius: 50%;
+	background: var(--serk-accent);
+	box-shadow: 0 0 0 5px color-mix(in srgb, var(--serk-accent) 25%, transparent);
+	flex: none;
+}
+.serk-login-foot {
+	position: relative;
+	z-index: 2;
+	font-size: 13px;
+	color: #a9c2bc;
+	letter-spacing: 0.3px;
+}
+@media (max-width: 860px) {
+	body.serk-login {
+		padding-left: 0;
+	}
+	.serk-login-panel {
+		position: relative;
+		width: auto;
+		min-height: 220px;
+		padding: 28px;
+	}
+	.serk-login-hero {
+		margin: 24px 0 8px;
+	}
+	.serk-login-hero ul {
+		display: none;
+	}
+	body.serk-login .for-login {
+		margin-top: 32px;
+	}
+}
+
+/* Footer */
+.web-footer .footer-powered {
+	color: var(--serk-muted);
+}

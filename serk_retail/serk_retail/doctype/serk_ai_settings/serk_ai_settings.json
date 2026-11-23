@@ -1,0 +1,101 @@
+{
+ "actions": [],
+ "creation": "2026-11-23 12:00:00.000000",
+ "description": "AI insights, forecasts narration and market analysis. Server environment variables SERK_AI_PROVIDER, SERK_AI_MODEL, SERK_AI_API_KEY and SERK_AI_BASE_URL take precedence (same convention as SERK Finance). The AI only reads aggregated figures; it never posts, edits or deletes anything.",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "enabled",
+  "provider",
+  "model",
+  "api_key",
+  "base_url",
+  "column_break_ai",
+  "max_tokens",
+  "share_item_names",
+  "market_context"
+ ],
+ "fields": [
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enable AI",
+   "default": "1"
+  },
+  {
+   "fieldname": "provider",
+   "fieldtype": "Select",
+   "label": "Provider",
+   "options": "Anthropic\nOpenAI\nOpenAI-compatible",
+   "default": "Anthropic"
+  },
+  {
+   "fieldname": "model",
+   "fieldtype": "Data",
+   "label": "Model",
+   "default": "claude-sonnet-5-5",
+   "description": "e.g. claude-sonnet-5-5 (Anthropic) or gpt-4.1 (OpenAI)."
+  },
+  {
+   "fieldname": "api_key",
+   "fieldtype": "Password",
+   "label": "API Key",
+   "description": "Stored encrypted. Not needed when SERK_AI_API_KEY is set on the server."
+  },
+  {
+   "fieldname": "base_url",
+   "fieldtype": "Data",
+   "label": "Base URL",
+   "description": "Only for OpenAI-compatible or self-hosted endpoints. HTTPS required."
+  },
+  {
+   "fieldname": "column_break_ai",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "max_tokens",
+   "fieldtype": "Int",
+   "label": "Max Output Tokens",
+   "default": "1800"
+  },
+  {
+   "fieldname": "share_item_names",
+   "fieldtype": "Check",
+   "label": "Share Product Names With The Model",
+   "default": "1",
+   "description": "Product and category names are sent with figures. Customer names, cashiers' emails and passwords are never sent."
+  },
+  {
+   "fieldname": "market_context",
+   "fieldtype": "Small Text",
+   "label": "Market Context",
+   "description": "Optional facts about your market the AI should consider (city, competitors, seasonality, holidays). The AI has no live internet data."
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-11-23 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "SERK Retail",
+ "name": "SERK AI Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 0,
+   "export": 0,
+   "print": 0,
+   "read": 1,
+   "report": 0,
+   "role": "System Manager",
+   "share": 0,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

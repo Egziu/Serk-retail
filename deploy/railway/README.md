@@ -21,7 +21,16 @@ SERK_DEMO_SEED=1
 DATA_DIR=/data
 SERK_ADMIN_PASSWORD=<generated, >= 12 chars>     # optional; Administrator
 SERK_DEMO_PASSWORD=<generated, >= 12 chars>      # optional; shared by the 5 fictional demo users
+SERK_DEMO_HISTORY_DAYS=60                        # optional; fictional sales history for the dashboard
+SERK_AI_PROVIDER=anthropic                       # optional AI analyst (same as SERK Finance)
+SERK_AI_MODEL=claude-sonnet-5-5
+SERK_AI_API_KEY=<secret>
 ```
+
+`SERK_DEMO_HISTORY_DAYS` queues a background job on boot that posts a deterministic, FICTIONAL
+history (real ERPNext invoices and receipts, so margins and stock come from the ledger). It runs
+once per site (idempotent) and takes roughly 15–30 minutes for 60 days; the dashboard fills in as
+it progresses. Never set it on a site with real data.
 
 First boot creates the site (~3–6 min) and loads **fictional** SERK Demo Mart data.
 

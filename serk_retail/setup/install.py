@@ -29,11 +29,21 @@ def after_install():
 	ensure_roles()
 	ensure_permissions()
 	configure_pos_mode()
+	ensure_brand()
 
 
 def after_migrate():
 	ensure_roles()
 	ensure_permissions()
+	ensure_brand()
+
+
+def ensure_brand():
+	"""SERK identity everywhere (logo, favicon, footer, app name) and SERK Retail as home app."""
+	from serk_retail.branding import _ensure_default_app, apply_brand
+
+	apply_brand()
+	_ensure_default_app()
 
 
 def ensure_roles():

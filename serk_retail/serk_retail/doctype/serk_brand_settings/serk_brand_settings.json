@@ -1,0 +1,241 @@
+{
+ "actions": [],
+ "creation": "2026-11-23 12:00:00.000000",
+ "description": "Your company's identity across SERK Retail: name, logo, colours, contacts. Applies to the desk, login page, receipts and emails.",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "identity_section",
+  "product_name",
+  "company_display_name",
+  "legal_name",
+  "motto",
+  "login_tagline",
+  "column_break_identity",
+  "logo",
+  "favicon",
+  "colours_section",
+  "primary_color",
+  "accent_color",
+  "sidebar_color",
+  "column_break_colours",
+  "background_color",
+  "sidebar_style",
+  "corner_style",
+  "chart_palette",
+  "contact_section",
+  "address",
+  "phone",
+  "email",
+  "website",
+  "column_break_contact",
+  "tin",
+  "vat_registration",
+  "footer_text",
+  "show_contact_in_footer"
+ ],
+ "fields": [
+  {
+   "fieldname": "identity_section",
+   "fieldtype": "Section Break",
+   "label": "Identity"
+  },
+  {
+   "fieldname": "product_name",
+   "fieldtype": "Data",
+   "label": "Product Name",
+   "default": "SERK Retail",
+   "reqd": 1,
+   "description": "Shown in the apps screen, browser tab and login page."
+  },
+  {
+   "fieldname": "company_display_name",
+   "fieldtype": "Data",
+   "label": "Company Display Name",
+   "description": "Trading name shown in the sidebar and dashboard."
+  },
+  {
+   "fieldname": "legal_name",
+   "fieldtype": "Data",
+   "label": "Legal Name"
+  },
+  {
+   "fieldname": "motto",
+   "fieldtype": "Data",
+   "label": "Motto",
+   "default": "Innovation with Integrity"
+  },
+  {
+   "fieldname": "login_tagline",
+   "fieldtype": "Small Text",
+   "label": "Login Tagline",
+   "default": "Retail operations, live insight and AI forecasting in one place."
+  },
+  {
+   "fieldname": "column_break_identity",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "logo",
+   "fieldtype": "Attach Image",
+   "label": "Logo",
+   "description": "Square or wide logo (SVG or PNG). Leave empty to use the SERK Retail mark."
+  },
+  {
+   "fieldname": "favicon",
+   "fieldtype": "Attach Image",
+   "label": "Favicon"
+  },
+  {
+   "fieldname": "colours_section",
+   "fieldtype": "Section Break",
+   "label": "Colours",
+   "description": "Defaults follow the SERK family palette (SERK Finance)."
+  },
+  {
+   "fieldname": "primary_color",
+   "fieldtype": "Color",
+   "label": "Primary Colour",
+   "default": "#166453",
+   "reqd": 1
+  },
+  {
+   "fieldname": "accent_color",
+   "fieldtype": "Color",
+   "label": "Accent Colour",
+   "default": "#61AD98",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sidebar_color",
+   "fieldtype": "Color",
+   "label": "Sidebar Colour",
+   "default": "#153335",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_colours",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "background_color",
+   "fieldtype": "Color",
+   "label": "Page Background",
+   "default": "#F6F8F7",
+   "reqd": 1
+  },
+  {
+   "fieldname": "sidebar_style",
+   "fieldtype": "Select",
+   "label": "Sidebar Style",
+   "options": "Dark\nLight",
+   "default": "Dark"
+  },
+  {
+   "fieldname": "corner_style",
+   "fieldtype": "Select",
+   "label": "Corner Style",
+   "options": "Rounded\nSoft\nSharp",
+   "default": "Rounded"
+  },
+  {
+   "fieldname": "chart_palette",
+   "fieldtype": "Small Text",
+   "label": "Chart Palette",
+   "default": "#166453,#61AD98,#E0A526,#2F6FB5,#C2553D,#7A5AA6",
+   "description": "Comma-separated hex colours used by dashboard charts, in order."
+  },
+  {
+   "fieldname": "contact_section",
+   "fieldtype": "Section Break",
+   "label": "Contact & Footer"
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Small Text",
+   "label": "Address"
+  },
+  {
+   "fieldname": "phone",
+   "fieldtype": "Data",
+   "label": "Phone",
+   "options": "Phone"
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "label": "Email",
+   "options": "Email"
+  },
+  {
+   "fieldname": "website",
+   "fieldtype": "Data",
+   "label": "Website",
+   "options": "URL"
+  },
+  {
+   "fieldname": "column_break_contact",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "tin",
+   "fieldtype": "Data",
+   "label": "TIN"
+  },
+  {
+   "fieldname": "vat_registration",
+   "fieldtype": "Data",
+   "label": "VAT Registration No."
+  },
+  {
+   "fieldname": "footer_text",
+   "fieldtype": "Data",
+   "label": "Footer Text",
+   "description": "Shown at the bottom of web pages and emails. Leave empty for the company name."
+  },
+  {
+   "fieldname": "show_contact_in_footer",
+   "fieldtype": "Check",
+   "label": "Show Contact Details In Footer",
+   "default": "1"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-11-23 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "SERK Retail",
+ "name": "SERK Brand Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 0,
+   "export": 0,
+   "print": 0,
+   "read": 1,
+   "report": 0,
+   "role": "System Manager",
+   "share": 0,
+   "write": 1
+  },
+  {
+   "create": 0,
+   "delete": 0,
+   "email": 0,
+   "export": 0,
+   "print": 0,
+   "read": 1,
+   "report": 0,
+   "role": "SERK Store Manager",
+   "share": 0,
+   "write": 1
+  }
+ ],
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

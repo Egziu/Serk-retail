@@ -1,0 +1,188 @@
+/* SERK Retail desk theme — SERK family palette (shared with SERK Finance).
+   Every colour comes from --serk-* variables that serk_theme.js sets from SERK Brand Settings;
+   the values below are only the defaults before boot. */
+:root {
+	--serk-primary: #166453;
+	--serk-primary-dark: #114e41;
+	--serk-primary-soft: #e8f0ee;
+	--serk-primary-softer: #f3f7f6;
+	--serk-accent: #61ad98;
+	--serk-accent-soft: #dceee9;
+	--serk-sidebar: #153335;
+	--serk-sidebar-2: #1e3b3d;
+	--serk-sidebar-3: #2c4a4c;
+	--serk-sidebar-line: #375456;
+	--serk-bg: #f6f8f7;
+	--serk-ink: #173b3c;
+	--serk-muted: #758584;
+	--serk-line: #e3eae7;
+	--serk-radius: 10px;
+	--serk-warn: #c98a12;
+	--serk-danger: #c2553d;
+	--serk-info: #2f6fb5;
+}
+
+/* ---------------------------------------------------------------- framework tokens */
+html.serk-theme,
+html.serk-theme [data-theme="light"] {
+	--primary: var(--serk-primary);
+	--primary-color: var(--serk-primary);
+	--btn-primary: var(--serk-primary);
+	--focus-default: 0 0 0 3px color-mix(in srgb, var(--serk-accent) 45%, transparent);
+	--sidebar-select-color: var(--serk-primary-soft);
+	--checkbox-color: var(--serk-primary);
+	--checkbox-gradient: linear-gradient(180deg, var(--serk-primary) -124.51%, var(--serk-primary) 100%);
+}
+
+html.serk-theme body {
+	background: var(--serk-bg);
+}
+html.serk-theme .main-section,
+html.serk-theme .page-container {
+	background: var(--serk-bg);
+}
+
+/* Buttons, links, active states */
+html.serk-theme .btn-primary,
+html.serk-theme .btn.btn-primary {
+	background-color: var(--serk-primary);
+	border-color: var(--serk-primary);
+	color: #fff;
+}
+html.serk-theme .btn-primary:hover,
+html.serk-theme .btn-primary:focus,
+html.serk-theme .btn-primary:active {
+	background-color: var(--serk-primary-dark) !important;
+	border-color: var(--serk-primary-dark) !important;
+}
+html.serk-theme .form-tabs .nav-link.active,
+html.serk-theme .form-tabs-list .nav-link.active {
+	color: var(--serk-primary);
+	border-bottom-color: var(--serk-primary);
+}
+html.serk-theme input[type="checkbox"]:checked {
+	background-color: var(--serk-primary);
+	border-color: var(--serk-primary);
+}
+html.serk-theme .progress-bar {
+	background-color: var(--serk-primary);
+}
+html.serk-theme .frappe-card,
+html.serk-theme .widget,
+html.serk-theme .form-section.card-section,
+html.serk-theme .frappe-list,
+html.serk-theme .layout-main-section {
+	border-radius: var(--serk-radius);
+}
+
+/* ---------------------------------------------------------------- dark sidebar (Finance look) */
+html.serk-theme.serk-sidebar-dark .dock {
+	background: var(--serk-sidebar);
+	border-right: 1px solid var(--serk-sidebar-line);
+	--icon-stroke: #cfe1dc;
+	--ink-gray-5: #a9c2bc;
+	--ink-gray-6: #cfe1dc;
+	--ink-gray-7: #e6f1ee;
+	--ink-gray-8: #f4faf8;
+	color: #e6f1ee;
+}
+html.serk-theme.serk-sidebar-dark .dock .dock-item {
+	color: #cfe1dc;
+}
+html.serk-theme.serk-sidebar-dark .dock .dock-item:hover {
+	background: var(--serk-sidebar-3);
+}
+html.serk-theme.serk-sidebar-dark .dock .dock-item.active {
+	background: var(--serk-primary);
+	color: #fff;
+	box-shadow: 0 0 0 1px color-mix(in srgb, var(--serk-accent) 55%, transparent);
+}
+html.serk-theme.serk-sidebar-dark .dock .dock-item svg,
+html.serk-theme.serk-sidebar-dark .dock .dock-item use {
+	stroke: currentColor;
+}
+
+html.serk-theme.serk-sidebar-dark .body-sidebar-container,
+html.serk-theme.serk-sidebar-dark .body-sidebar {
+	background: var(--serk-sidebar-2);
+	border-right: 1px solid var(--serk-sidebar-line);
+	--icon-stroke: #b9d0ca;
+	--ink-gray-4: #8fa9a3;
+	--ink-gray-5: #a9c2bc;
+	--ink-gray-6: #c6dad5;
+	--ink-gray-7: #dcebe7;
+	--ink-gray-8: #eef6f4;
+	--ink-gray-9: #f7fbfa;
+	--text-color: #dcebe7;
+	--heading-color: #f7fbfa;
+	--surface-gray-2: var(--serk-sidebar-3);
+	--surface-gray-3: var(--serk-sidebar-line);
+	--outline-gray-1: var(--serk-sidebar-line);
+	--sidebar-select-color: var(--serk-sidebar-3);
+	color: #dcebe7;
+}
+html.serk-theme.serk-sidebar-dark .body-sidebar .sidebar-item-label,
+html.serk-theme.serk-sidebar-dark .body-sidebar .header-title {
+	color: #e6f1ee;
+}
+html.serk-theme.serk-sidebar-dark .body-sidebar .header-title {
+	font-weight: 600;
+	letter-spacing: -0.2px;
+}
+html.serk-theme.serk-sidebar-dark .body-sidebar .standard-sidebar-item.active-sidebar,
+html.serk-theme.serk-sidebar-dark .body-sidebar .sidebar-item-container .active,
+html.serk-theme.serk-sidebar-dark .body-sidebar .sidebar-item-container.active > .desk-sidebar-item,
+html.serk-theme.serk-sidebar-dark .body-sidebar .selected {
+	background: var(--serk-sidebar-3) !important;
+	box-shadow: inset 3px 0 0 var(--serk-accent);
+	color: #fff;
+}
+html.serk-theme.serk-sidebar-dark .body-sidebar a:hover,
+html.serk-theme.serk-sidebar-dark .body-sidebar .standard-sidebar-item:hover {
+	background: var(--serk-sidebar-3);
+}
+html.serk-theme.serk-sidebar-dark .sidebar-edge,
+html.serk-theme.serk-sidebar-dark .sidebar-collapse-arrow {
+	color: #cfe1dc;
+}
+
+/* Light sidebar variant */
+html.serk-theme:not(.serk-sidebar-dark) .dock,
+html.serk-theme:not(.serk-sidebar-dark) .body-sidebar {
+	background: var(--serk-primary-softer);
+}
+html.serk-theme:not(.serk-sidebar-dark) .body-sidebar .standard-sidebar-item.active-sidebar {
+	background: var(--serk-primary-soft);
+	box-shadow: inset 3px 0 0 var(--serk-primary);
+}
+html.serk-theme:not(.serk-sidebar-dark) .dock .dock-item.active {
+	background: var(--serk-primary);
+	color: #fff;
+}
+
+/* Brand logos sit on the coloured rail without an extra frame */
+html.serk-theme .dock-logo .header-logo img,
+html.serk-theme .shell-header img {
+	border-radius: 9px;
+}
+
+/* Splash while the desk boots */
+.serk-splash {
+	background: var(--serk-sidebar, #153335);
+}
+
+/* Apps screen tiles */
+html.serk-theme .desktop-page .app-title,
+html.serk-theme .desktop-page .desktop-app-title {
+	font-weight: 600;
+	color: var(--serk-ink);
+}
+
+/* Frappe UI ("espresso") solid buttons */
+html.serk-theme .es-button[data-variant="solid"] {
+	background: var(--serk-primary);
+	color: #fff;
+}
+html.serk-theme .es-button[data-variant="solid"]:hover {
+	background: var(--serk-primary-dark);
+}

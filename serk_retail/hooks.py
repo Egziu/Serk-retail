@@ -12,6 +12,35 @@ app_license = "gpl-3.0"
 
 required_apps = ["erpnext"]
 
+# ---------------------------------------------------------------- identity (SERK, not upstream)
+app_logo_url = "/assets/serk_retail/images/serk-retail-mark.svg"
+app_home = "/desk/serk-command-center"
+add_to_apps_screen = [
+	{
+		"name": "serk_retail",
+		"logo": "/assets/serk_retail/images/serk-retail-mark.svg",
+		"title": "SERK Retail",
+		"route": "/desk/serk-command-center",
+		"has_permission": "serk_retail.branding.check_app_permission",
+		"sequence_id": 1,
+	}
+]
+
+# Theme + brand runtime (colours come from SERK Brand Settings at boot).
+app_include_css = ["/assets/serk_retail/css/serk_desk.css", "/assets/serk_retail/css/serk_command_center.css"]
+app_include_js = ["/assets/serk_retail/js/serk_theme.js"]
+web_include_css = ["/assets/serk_retail/css/serk_web.css"]
+web_include_js = ["/assets/serk_retail/js/serk_web.js"]
+
+extend_bootinfo = ["serk_retail.branding.extend_bootinfo"]
+update_website_context = ["serk_retail.branding.update_website_context"]
+website_context = {
+	"favicon": "/assets/serk_retail/images/serk-favicon.svg",
+	"splash_image": "/assets/serk_retail/images/serk-retail-mark.svg",
+}
+email_brand_image = "assets/serk_retail/images/serk-retail-mark.svg"
+jinja = {"methods": ["serk_retail.branding.serk_footer_line"]}
+
 use_json_request_body = True
 export_python_type_annotations = True
 require_type_annotated_api_methods = True

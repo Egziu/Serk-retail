@@ -5,7 +5,8 @@
 # Optional env:  DB_PORT (3306), SITE_NAME (serk-demo.local), PUBLIC_URL, PORT (8000),
 #                SERK_DEMO_SEED (1 = load fictional demo data on first boot),
 #                DATA_DIR (/data, a persistent volume), GUNICORN_WORKERS (2),
-#                SERK_ADMIN_PASSWORD, SERK_DEMO_PASSWORD (see below)
+#                SERK_ADMIN_PASSWORD, SERK_DEMO_PASSWORD (see below), SERK_DEMO_HISTORY_DAYS (0 = off),
+#                SERK_AI_PROVIDER / SERK_AI_MODEL / SERK_AI_API_KEY / SERK_AI_BASE_URL (AI analyst, as in SERK Finance)
 # Secrets: if SERK_ADMIN_PASSWORD / SERK_DEMO_PASSWORD are set (e.g. Railway variables), they are
 # (re)applied on EVERY boot, so rotating the variable rotates the password (and overwrites any
 # change made in the app). If unset, random passwords are generated on first boot. Either way the
@@ -28,7 +29,9 @@ if [ "$(id -u)" = "0" ]; then
 		DB_ROOT_PASSWORD="${DB_ROOT_PASSWORD:?DB_ROOT_PASSWORD is required}" REDIS_URL="${REDIS_URL:?REDIS_URL is required}" \
 		PUBLIC_URL="${PUBLIC_URL:-}" PORT="$PORT" SERK_DEMO_SEED="${SERK_DEMO_SEED:-1}" \
 		GUNICORN_WORKERS="${GUNICORN_WORKERS:-2}" SERK_ADMIN_PASSWORD="${SERK_ADMIN_PASSWORD:-}" \
-		SERK_DEMO_PASSWORD="${SERK_DEMO_PASSWORD:-}" HOME=/home/frappe PATH="/home/frappe/.local/bin:/usr/local/bin:/usr/bin:/bin" \
+		SERK_DEMO_PASSWORD="${SERK_DEMO_PASSWORD:-}" SERK_DEMO_HISTORY_DAYS="${SERK_DEMO_HISTORY_DAYS:-0}" \
+		SERK_AI_PROVIDER="${SERK_AI_PROVIDER:-}" SERK_AI_MODEL="${SERK_AI_MODEL:-}" SERK_AI_API_KEY="${SERK_AI_API_KEY:-}" \
+		SERK_AI_BASE_URL="${SERK_AI_BASE_URL:-}" ANTHROPIC_API_KEY="${ANTHROPIC_API_KEY:-}" OPENAI_API_KEY="${OPENAI_API_KEY:-}" HOME=/home/frappe PATH="/home/frappe/.local/bin:/usr/local/bin:/usr/bin:/bin" \
 		"$0"
 fi
 
@@ -97,6 +100,13 @@ bench use "$SITE_NAME" >/dev/null
 bench --site "$SITE_NAME" set-config developer_mode 0 >/dev/null
 bench --site "$SITE_NAME" migrate
 bench --site "$SITE_NAME" enable-scheduler >/dev/null || true
+
+# Fictional trading history for the demo dashboard (background job; idempotent, runs once).
+if [ "${SERK_DEMO_SEED}" = "1" ] && [ "${SERK_DEMO_HISTORY_DAYS:-0}" -gt 0 ] 2>/dev/null; then
+	log "queueing FICTIONAL demo history (${SERK_DEMO_HISTORY_DAYS} days) as a background job"
+	bench --site "$SITE_NAME" execute serk_retail.setup.demo_history.enqueue \
+		--kwargs "{\"days\": ${SERK_DEMO_HISTORY_DAYS}}" >/dev/null || log "demo history not queued"
+fi
 
 log "starting worker, scheduler and web on :$PORT"
 bench worker --queue short,default,long &
