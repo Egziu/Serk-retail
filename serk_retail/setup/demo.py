@@ -90,8 +90,9 @@ def _ensure(doctype, name, values):
 
 def _users(write_credentials: bool):
 	creds = {}
+	shared = os.environ.get("SERK_DEMO_PASSWORD") or None  # e.g. a Railway variable; never logged
 	for email, (full_name, roles) in USERS.items():
-		pwd = secrets.token_urlsafe(18)
+		pwd = shared or secrets.token_urlsafe(18)
 		if not frappe.db.exists("User", email):
 			u = frappe.get_doc({"doctype": "User", "email": email, "first_name": full_name,
 								"send_welcome_email": 0, "user_type": "System User"})
@@ -108,6 +109,30 @@ def _users(write_credentials: bool):
 			for k, v in creds.items():
 				fh.write(f"{k}\t{v}\n")
 	return creds
+
+
+def apply_env_password(user: str, env_var: str) -> None:
+	"""Set a password from an environment variable (deploy-time rotation). The secret is read from
+	the process environment, never passed as an argument, so it cannot appear in argv or logs.
+	user: a User name, or "demo" for all synthetic demo users. Only demo users and Administrator
+	are accepted, so this cannot be pointed at real accounts."""
+	from frappe.utils.password import update_password
+
+	pwd = os.environ.get(env_var) or ""
+	if len(pwd) < 12:
+		raise ValueError(f"{env_var} is unset or shorter than 12 characters")
+	targets = list(USERS) if user == "demo" else [user]
+	for target in targets:
+		if target != "Administrator" and target not in USERS:
+			raise ValueError("apply_env_password only manages Administrator and the demo users")
+		if frappe.db.exists("User", target):
+			update_password(target, pwd, logout_all_sessions=True)
+	if user == "demo":
+		path = os.path.expanduser("~/.serk_demo_credentials")
+		with open(os.open(path, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600), "w") as fh:
+			for target in targets:
+				fh.write(f"{target}\t{pwd}\n")
+	frappe.db.commit()  # nosemgrep: frappe-manual-commit -- deploy-time maintenance command
 
 
 def seed(write_credentials: bool = True) -> dict:

@@ -9,6 +9,7 @@ Honesty notes:
   Delivery Unknown (sent, outcome ambiguous).
 """
 
+from collections import deque
 from dataclasses import dataclass, field
 from typing import Protocol
 
@@ -49,7 +50,8 @@ class SimulatedEscPosPrinter:
 
 	name: str = "Simulated ESC/POS"
 	fault: str | None = None
-	sent: list = field(default_factory=list)
+	# Bounded: the simulator runs inside a long-lived worker; keep only recent output.
+	sent: deque = field(default_factory=lambda: deque(maxlen=200))
 
 	def send(self, text: str, open_drawer: bool) -> PrintResult:
 		data = encode_escpos(text, open_drawer)

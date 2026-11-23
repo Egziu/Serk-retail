@@ -18,6 +18,7 @@ import frappe
 from frappe.utils import flt
 
 from serk_retail.api import inventory, pos
+from serk_retail.core.authz import APPROVAL_MAX_FAILURES, approval_tracker
 from serk_retail.core.errors import (
 	IdempotencyConflict,
 	InsufficientPayment,
@@ -33,6 +34,7 @@ PRICE = {"SERK-WATER-500": Decimal("25"), "SERK-INJERA-5": Decimal("60"), "SERK-
 VAT = Decimal("0.15")
 LANE1, LANE2 = "SDM Lane 1", "SDM Lane 2"
 C1, C2, SUP = "cashier1@serk.test", "cashier2@serk.test", "supervisor@serk.test"
+MGR = "manager@serk.test"
 WATER_BARCODE = "0012345678905"
 
 
@@ -87,6 +89,8 @@ class TestM1RetailFlow(unittest.TestCase):
 															"receipt_width_chars": "48"})
 		frappe.clear_document_cache("SERK Retail Settings", "SERK Retail Settings")
 		frappe.db.commit()
+		for approver in (SUP, MGR):  # approval lockout counters live in Redis across runs
+			approval_tracker(approver).add_success_attempt()
 		for lane in (LANE1, LANE2):
 			cls._force_close_open_shifts(lane)
 		# Plenty of stock for the suite (the full-cycle test also receives explicitly).
@@ -415,3 +419,36 @@ class TestM1RetailFlow(unittest.TestCase):
 			self.assertEqual(sorted(errors), ["RefundExceedsEntitlement"] * 2)
 			returned = frappe.db.sql("""select sum(qty) from `tabSales Invoice Item` where sales_invoice_item=%s and docstatus=1""", row)[0][0]
 			self.assertAlmostEqual(flt(returned), -2)
+
+	# ------------------------------------------------------------------ RET-SEC-002 / R-08 lockout
+	def test_14_supervisor_approval_locks_after_repeated_failures(self):
+		with self.shift(LANE2, C2) as oe:
+			sale = self.sell(C2, oe, [{"item_code": "SERK-WATER-500", "qty": 1}], 50)
+			base = dict(pos_opening_entry=oe, return_against=sale["sales_invoice"], reason="lockout test",
+						items=[{"item_code": "SERK-WATER-500", "qty": 1}])
+			try:
+				for _ in range(APPROVAL_MAX_FAILURES):
+					with self.assertRaises(NotAuthorized):
+						call(C2, pos.submit_return, approver=MGR, approver_password="wrong-password-123",
+							 idempotency_key=key(), **base)
+				# Locked: even the correct password is refused until the window expires.
+				with self.assertRaises(NotAuthorized) as cm:
+					call(C2, pos.submit_return, approver=MGR, approver_password=self.pw[MGR],
+						 idempotency_key=key(), **base)
+				self.assertIn("Too many failed approvals", str(cm.exception))
+				self.assertEqual(frappe.db.count("Sales Invoice", {"return_against": sale["sales_invoice"]}), 0)
+				# Another supervisor is unaffected.
+				call(C2, pos.submit_return, approver=SUP, approver_password=self.pw[SUP], idempotency_key=key(), **base)
+			finally:
+				approval_tracker(MGR).add_success_attempt()
+
+	def test_15_refund_by_item_code_uses_the_line_that_still_has_quantity(self):
+		with self.shift(LANE2, C2) as oe:
+			sale = self.sell(C2, oe, [{"item_code": "SERK-WATER-500", "qty": 1},
+									  {"item_code": "SERK-WATER-500", "qty": 1}], 100)
+			args = dict(pos_opening_entry=oe, return_against=sale["sales_invoice"], reason="two lines",
+						items=[{"item_code": "SERK-WATER-500", "qty": 1}], approver=SUP, approver_password=self.pw[SUP])
+			call(C2, pos.submit_return, idempotency_key=key(), **args)
+			call(C2, pos.submit_return, idempotency_key=key(), **args)  # second line, not "exceeds"
+			with self.assertRaises(RefundExceedsEntitlement):
+				call(C2, pos.submit_return, idempotency_key=key(), **args)

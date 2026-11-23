@@ -332,9 +332,14 @@ def submit_return(
 			row = line.get("original_line")
 			if not row:
 				candidates = [n for n, r in remaining.items() if r["item_code"] == line.get("item_code")]
-				row = candidates[0] if candidates else None
+				# Prefer a line that can still absorb this quantity, then any with stock left.
+				fits = [n for n in candidates if remaining[n]["remaining"] - wanted.get(n, 0) - qty > -1e-9]
+				left = [n for n in candidates if remaining[n]["remaining"] - wanted.get(n, 0) > 1e-9]
+				row = (fits or left or candidates or [None])[0]
 			if row not in remaining:
-				raise InvalidRequest(_("Line {0} is not on sale {1}.").format(line, return_against))
+				raise InvalidRequest(
+					_("Item {0} is not on sale {1}.").format(line.get("original_line") or line.get("item_code"), return_against)
+				)
 			wanted[row] = wanted.get(row, 0) + qty
 		for row, qty in wanted.items():
 			if qty - remaining[row]["remaining"] > 1e-9:

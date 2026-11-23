@@ -11,7 +11,7 @@ Likelihood/Impact: L/M/H. Owner "SERK Eng" unless stated.
 | R-05 | No offline operation: a server or LAN outage stops checkout | H | H | M2 branch-continuity design; until then pilot needs store-local server + UPS. |
 | R-06 | Workarounds for upstream least-privilege defects (G-10, G-11) may break on upgrade | M | M | Recorded in CORE_PATCH_REGISTER; tests fail loudly if behaviour changes. |
 | R-07 | Refusal audit uses rollback-then-commit; safe only because checks precede writes | M | M | Enforced by code review rule in `audit.py`; add a static check later. |
-| R-08 | Supervisor password at the register: no rate limit/lockout, shoulder-surfing risk | M | H | Planned: per-approver lockout, PIN/badge with separate secret, audit alerting. |
+| R-08 | Supervisor password at the register: shoulder-surfing risk (brute force now mitigated) | M | M | **Mitigated 2026-11-23**: per-approver lockout, 5 failures / 15 min (authz.verify_approver, test_14). Still planned: PIN/badge with separate secret, audit alerting. |
 | R-09 | Audit table is tamper-*resistant* only through the app; DB admins can alter rows | M | M | Planned: export to independently controlled sink; content_hash verification job. |
 | R-10 | Idempotency records grow without bound | L | M | Retention/purge policy design pending (must outlive replay window and backups). |
 | R-11 | Amharic/Tigrinya glyphs unsupported in ESC/POS text mode | H | M | M1 ASCII receipts; validated raster rendering needed. |

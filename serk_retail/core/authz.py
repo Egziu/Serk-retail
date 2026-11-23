@@ -58,16 +58,44 @@ def require_register_assignment(pos_profile: str, user=None):
 
 def verify_approver(approver: str, approver_password: str, actor: str, roles=(SUPERVISOR, MANAGER)):
 	"""Supervisor override at the register: a different user with an approving role re-enters
-	their own password. Rate limiting / lockout are NOT yet implemented (see RISK_REGISTER R-08)."""
+	their own password.
+
+	Brute-force protection (RISK_REGISTER R-08): failed approvals are counted per approver in Redis
+	(Frappe's LoginAttemptTracker, separate key from desk logins). After APPROVAL_MAX_FAILURES
+	failures inside APPROVAL_LOCK_SECONDS the approver is locked for approvals until the window
+	expires, even with the right password. The counter lives in Redis, so it survives the request
+	rollback that log_refusal_and_raise performs."""
 	if not approver or not approver_password:
 		raise NotAuthorized("Supervisor approval is required.")
 	if approver == actor:
 		raise NotAuthorized("You cannot approve your own restricted action.")
+	tracker = approval_tracker(approver)
+	if not tracker.is_user_allowed():
+		raise NotAuthorized("Too many failed approvals for this supervisor. Try again later.")
 	if not frappe.db.get_value("User", approver, "enabled"):
+		tracker.add_failure_attempt()
 		raise NotAuthorized("Approver is not an active user.")
 	if not has_any_role(roles, user=approver):
+		tracker.add_failure_attempt()
 		raise NotAuthorized("Approver does not hold a supervisor role.")
 	try:
 		check_password(approver, approver_password, delete_tracker_cache=False)
 	except frappe.AuthenticationError:
+		tracker.add_failure_attempt()
 		raise NotAuthorized("Supervisor approval failed.")
+	tracker.add_success_attempt()
+
+
+APPROVAL_MAX_FAILURES = 5
+APPROVAL_LOCK_SECONDS = 15 * 60
+
+
+def approval_tracker(approver: str):
+	from frappe.auth import LoginAttemptTracker
+
+	# is_user_allowed() allows while failures <= max, so max - 1 yields a lock on the Nth failure.
+	return LoginAttemptTracker(
+		f"serk_approval:{approver}",
+		max_consecutive_login_attempts=APPROVAL_MAX_FAILURES - 1,
+		lock_interval=APPROVAL_LOCK_SECONDS,
+	)

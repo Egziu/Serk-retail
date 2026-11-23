@@ -27,7 +27,7 @@ RET-SEC-001,Server-side role and register checks,M1,tested,core/authz.py,test_07
 RET-SEC-002,Separation of duties for refunds,M1,tested,core/authz.py::verify_approver,test_06
 RET-SEC-003,Refusals audited,M1,tested,core/audit.py::log_refusal_and_raise,test_06
 RET-SEC-005,Audit events append-only through the app,M1,tested,doctype/serk_audit_event,test_12
-RET-SEC-008,Approval brute-force protection,M2,planned,,R-08
+RET-SEC-008,Approval brute-force protection,M2,implemented+tested,test_14,R-08
 RET-SEC-010,SBOM and dependency scanning,M2,planned,,
 RET-TEN-001,Tenant isolation by site/database,M4,designed,docs/architecture/DECISIONS.md ADR-006,
 RET-OFF-001,Durable offline checkout journal,M2,planned,,

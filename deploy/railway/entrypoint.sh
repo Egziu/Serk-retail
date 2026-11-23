@@ -4,9 +4,12 @@
 # Required env:  DB_HOST, DB_ROOT_PASSWORD, REDIS_URL
 # Optional env:  DB_PORT (3306), SITE_NAME (serk-demo.local), PUBLIC_URL, PORT (8000),
 #                SERK_DEMO_SEED (1 = load fictional demo data on first boot),
-#                DATA_DIR (/data, a persistent volume), GUNICORN_WORKERS (2)
-# Secrets: the Administrator password and demo-user passwords are generated on first boot and
-# written ONLY to $DATA_DIR/secrets/ (0600). They are never printed to the logs.
+#                DATA_DIR (/data, a persistent volume), GUNICORN_WORKERS (2),
+#                SERK_ADMIN_PASSWORD, SERK_DEMO_PASSWORD (see below)
+# Secrets: if SERK_ADMIN_PASSWORD / SERK_DEMO_PASSWORD are set (e.g. Railway variables), they are
+# (re)applied on EVERY boot, so rotating the variable rotates the password (and overwrites any
+# change made in the app). If unset, random passwords are generated on first boot. Either way the
+# current values are written ONLY to $DATA_DIR/secrets/ (0600) and never printed to the logs.
 set -euo pipefail
 
 DATA_DIR=${DATA_DIR:-/data}
@@ -24,7 +27,8 @@ if [ "$(id -u)" = "0" ]; then
 		DATA_DIR="$DATA_DIR" SITE_NAME="$SITE_NAME" DB_HOST="${DB_HOST:?DB_HOST is required}" DB_PORT="$DB_PORT" \
 		DB_ROOT_PASSWORD="${DB_ROOT_PASSWORD:?DB_ROOT_PASSWORD is required}" REDIS_URL="${REDIS_URL:?REDIS_URL is required}" \
 		PUBLIC_URL="${PUBLIC_URL:-}" PORT="$PORT" SERK_DEMO_SEED="${SERK_DEMO_SEED:-1}" \
-		GUNICORN_WORKERS="${GUNICORN_WORKERS:-2}" HOME=/home/frappe PATH="/home/frappe/.local/bin:/usr/local/bin:/usr/bin:/bin" \
+		GUNICORN_WORKERS="${GUNICORN_WORKERS:-2}" SERK_ADMIN_PASSWORD="${SERK_ADMIN_PASSWORD:-}" \
+		SERK_DEMO_PASSWORD="${SERK_DEMO_PASSWORD:-}" HOME=/home/frappe PATH="/home/frappe/.local/bin:/usr/local/bin:/usr/bin:/bin" \
 		"$0"
 fi
 
@@ -58,7 +62,8 @@ umask 077
 ADMIN_PW_FILE="$DATA_DIR/secrets/administrator_password"
 if [ ! -d "sites/$SITE_NAME" ]; then
 	log "first boot: creating site $SITE_NAME (this takes a few minutes)"
-	[ -f "$ADMIN_PW_FILE" ] || python3 -c "import secrets;print(secrets.token_urlsafe(18))" > "$ADMIN_PW_FILE"
+	if [ -n "$SERK_ADMIN_PASSWORD" ]; then printf '%s\n' "$SERK_ADMIN_PASSWORD" > "$ADMIN_PW_FILE"
+	elif [ ! -f "$ADMIN_PW_FILE" ]; then python3 -c "import secrets;print(secrets.token_urlsafe(18))" > "$ADMIN_PW_FILE"; fi
 	bench new-site "$SITE_NAME" --db-host "$DB_HOST" --db-port "$DB_PORT" \
 		--db-root-username root --db-root-password "$DB_ROOT_PASSWORD" \
 		--mariadb-user-host-login-scope='%' --admin-password "$(cat "$ADMIN_PW_FILE")" \
@@ -67,10 +72,23 @@ if [ ! -d "sites/$SITE_NAME" ]; then
 		log "loading FICTIONAL demo data (SERK Demo Mart)"
 		# Keep HOME=/home/frappe: bench is a pip --user install, so a different HOME hides it
 		# from Python. The seed writes ~/.serk_demo_credentials (0600); move it to the volume.
+		# The seed reads SERK_DEMO_PASSWORD from the environment (random per user if unset).
 		bench --site "$SITE_NAME" execute serk_retail.setup.demo.seed >/dev/null
 		mv -f "$HOME/.serk_demo_credentials" "$DATA_DIR/secrets/demo_user_credentials"
 	fi
 	log "site created; credentials are in $DATA_DIR/secrets/ (not logged)"
+else
+	# Re-apply passwords managed by variables (rotation). Values go via env, never argv/logs.
+	if [ -n "$SERK_ADMIN_PASSWORD" ]; then
+		bench --site "$SITE_NAME" execute serk_retail.setup.demo.apply_env_password \
+			--kwargs '{"user": "Administrator", "env_var": "SERK_ADMIN_PASSWORD"}' >/dev/null
+		printf '%s\n' "$SERK_ADMIN_PASSWORD" > "$ADMIN_PW_FILE"
+	fi
+	if [ -n "$SERK_DEMO_PASSWORD" ] && [ "${SERK_DEMO_SEED}" = "1" ]; then
+		bench --site "$SITE_NAME" execute serk_retail.setup.demo.apply_env_password \
+			--kwargs '{"user": "demo", "env_var": "SERK_DEMO_PASSWORD"}' >/dev/null
+		mv -f "$HOME/.serk_demo_credentials" "$DATA_DIR/secrets/demo_user_credentials"
+	fi
 fi
 umask 022
 
@@ -85,7 +103,7 @@ bench worker --queue short,default,long &
 bench schedule &
 (cd sites && exec ../env/bin/gunicorn --bind "0.0.0.0:$PORT" --workers "${GUNICORN_WORKERS}" \
 	--timeout 120 --graceful-timeout 30 --worker-tmp-dir /dev/shm \
-	--access-logfile - --error-logfile - frappe.app:application --preload) &
+	--access-logfile - --error-logfile - --pythonpath /home/frappe/serk-deploy serk_wsgi:application --preload) &
 # If any process exits, exit the container so Railway restarts it.
 wait -n
 log "a process exited; stopping container"

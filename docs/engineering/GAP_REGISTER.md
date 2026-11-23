@@ -31,5 +31,5 @@ SERK code on documented extension points) · **Missing** · **Defective** · **U
 | G-23 | Tenant isolation between unrelated customers | Unsupported via multi-company | ERPNext multi-company is not a security boundary | ADR-006: one site/DB per tenant |
 | G-24 | Price override with supervisor | Missing in SERK API | client prices rejected | Planned RET-PRC-002 |
 | G-25 | Non-cash tenders (mobile money, card) | Missing | — | Blocked: provider specs/credentials |
-| G-26 | Approval brute-force protection | Missing | `check_password` used without lockout | Risk R-08 |
+| G-26 | Approval brute-force protection | Closed 2026-11-23 | Per-approver LoginAttemptTracker lockout (5/15 min) | Risk R-08, test_14 |
 | G-27 | Benchmark of other retail platforms | Not started | — | BENCHMARK_MATRIX.md stub |

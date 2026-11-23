@@ -46,7 +46,9 @@ RUN cd frappe-bench \
 
 USER root
 COPY deploy/railway/entrypoint.sh /usr/local/bin/serk-entrypoint
-RUN chmod 755 /usr/local/bin/serk-entrypoint
+# WSGI wrapper: serves /assets and public /files (no nginx in this image) behind Railway's proxy.
+COPY deploy/railway/serk_wsgi.py /home/frappe/serk-deploy/serk_wsgi.py
+RUN chmod 755 /usr/local/bin/serk-entrypoint && chmod 644 /home/frappe/serk-deploy/serk_wsgi.py
 ENV PORT=8000
 EXPOSE 8000
 # Starts as root only to fix ownership of the mounted volume, then drops to the frappe user.

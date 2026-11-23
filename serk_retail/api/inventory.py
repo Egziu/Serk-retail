@@ -28,6 +28,10 @@ def receive_stock(
 	if frappe.db.get_value("Warehouse", warehouse, "company") != company:
 		raise InvalidRequest(_("Warehouse {0} does not belong to {1}.").format(warehouse, company))
 	for line in items:
+		if not isinstance(line, dict) or not line.get("item_code"):
+			raise InvalidRequest(_("Each received line needs an item_code."))
+		if not frappe.db.exists("Item", {"name": line["item_code"], "is_stock_item": 1}):
+			raise InvalidRequest(_("Unknown stock item {0}.").format(line["item_code"]))
 		if flt(line.get("qty")) <= 0 or flt(line.get("rate")) < 0:
 			raise InvalidRequest(_("Received quantity must be positive and cost cannot be negative."))
 

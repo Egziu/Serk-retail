@@ -28,7 +28,7 @@ Controller refuses update and delete (test_12).
 | Duplicate submission (double click, retry, replay of the same request) | Idempotency (ADR-004) | Tested |
 | Request tampering with prices | Server ignores/rejects client prices | Tested |
 | Cashier self-authorising refunds | Different-user supervisor approval with password | Tested |
-| Brute-forcing supervisor password at register | — | **Open (R-08)** |
+| Brute-forcing supervisor password at register | Per-approver lockout (5 failures / 15 min, Redis) | **Mitigated** (test_14); PIN/badge still planned (R-08) |
 | Cross-shift / cross-register misuse | Ownership + assignment checks | Tested |
 | Cross-tenant access | Separate site/DB per tenant (ADR-006) | Design only, untested |
 | Malicious localhost/LAN access to a device bridge | No bridge exists yet | N/A |
